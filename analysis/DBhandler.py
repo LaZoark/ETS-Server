@@ -1,6 +1,6 @@
 import mysql.connector
 # from mysql.connector import errorcode
-
+import logging
 
 class DbHandler:
 
@@ -9,34 +9,37 @@ class DbHandler:
         self.persistence = persistence
 
     def __enter__(self):
-        print("connessione al database")
+        logging.info("[DB] Connecting to database...")
         if self.persistence:
             try:
                 self.mydb = mysql.connector.connect(
                     host=self.config["host"],
+                    port=self.config["db_port"],
                     user=self.config["username"],
                     password=self.config["password"],
-                    database="pds"
-                    # ,auth_plugin = "mysql_native_password"
+                    database="pds",
+                    # auth_plugin = self.config["root_password"],
                 )
                 self.mycursor = self.mydb.cursor()
                 return self
             except:
-                raise Exception("Problemi di connessione!")
+                # raise Exception("[DB] Unable to connect.")
+                logging.error(f"[DB] Unable to connect.")
         else:
             try:
                 self.mydb = mysql.connector.connect(
                     host=self.config["host"],
+                    port=self.config["db_port"],
                     user=self.config["username"],
                     password=self.config["password"],
-                    # ,auth_plugin = "mysql_native_password"
+                    # auth_plugin = self.config["root_password"],
                 )
                 self.mycursor = self.mydb.cursor()
                 return self
             except Exception as e:
-                print(e)
-                raise Exception("Problemi di connessione!")
-
+                # print(e)
+                # raise Exception("[DB] Unable to connect.")
+                logging.error(f"[DB] Unable to connect. #{e}")
 
     def createDatabase(self):
         self.mycursor.execute("CREATE DATABASE IF NOT EXISTS pds")
@@ -60,7 +63,7 @@ class DbHandler:
             except Exception as e:
                 print(e)
                 exit(1)
-        print("table created/reset with success")
+        logging.info("table created/reset with success")
 
 
     def insert (self, value):
@@ -68,8 +71,7 @@ class DbHandler:
         sql_formula = "INSERT INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         try:
             mycursor.execute("USE pds")
-            print("Trying to insert this")
-            print(value)
+            logging.info(f"Trying to insert this: {value}")
             mycursor.executemany(sql_formula, value)
             self.mydb.commit()
         except Exception as e:

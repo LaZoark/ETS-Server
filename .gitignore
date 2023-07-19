@@ -1,0 +1,6 @@
+/nycu-sniffer
+/db
+*.pyc
+mariadb_docker.sh
+configurations.yaml
+configurations.yaml

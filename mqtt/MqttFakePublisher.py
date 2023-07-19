@@ -8,7 +8,8 @@ class MQTTFakePublisher:
     def __init__(self, config):
         self.config = config
 
-        self.mqttc = mqtt.Client(client_id=config['MQTT_username_fake_publisher'], transport='websockets')
+        self.mqttc = mqtt.Client(client_id=config['MQTT_username_publisher'],
+                                 transport='tcp')
         self.mqttc.on_message = self.on_message
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_connect = self.on_connect
@@ -22,7 +23,8 @@ class MQTTFakePublisher:
 
     def start(self):
         print("connecting to: ", self.config["MQTT_Broker"], "on port ", self.config["MQTT_Port"])
-        self.mqttc.username_pw_set(username=self.config['MQTT_username_fake_publisher'])
+        self.mqttc.username_pw_set(username=self.config['MQTT_username_publisher'],
+                                   password=self.config['MQTT_password_publisher'])
         self.mqttc.connect(self.config["MQTT_Broker"], self.config["MQTT_Port"], self.config["Keep_Alive_Interval"])
 
     def on_subscribe(self):

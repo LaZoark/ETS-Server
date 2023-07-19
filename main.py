@@ -1,12 +1,24 @@
 import argparse
 import yaml
 import threading
-
+import logging
 from server.EtsServer import EtsServer
+
+# TODO: 
+# The following part should move to another file for the maintenance purpose
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
+    # format="[%(asctime)s][%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
+    # datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+
 
 def main(config, persistence, fake):
     # parameters initalization
-    print("persistence = ", persistence, "Fake publish = ", fake)
+    # print("persistence = ", persistence, "Fake publish = ", fake)
+    logging.info(f"{persistence = }, Fake publish = {fake}")
     ets = EtsServer(config, fake=fake, db_persistence=persistence)
     ets.start()
     go = True
@@ -20,16 +32,21 @@ def main(config, persistence, fake):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ETS Server')
-    parser.add_argument('-c', '--config', default=None, type=str, help='config file path (default: configurations.yaml)')
-    parser.add_argument('-p', '--persistence', action='store_true', help='use to avoid to clean existing database')
-    parser.add_argument('-fp', '--fakepublisher', action='store_true', help='Run the mqtt fake publisher')
+    parser.add_argument('-c', '--config', default=None, type=str, 
+                        help='config file path (default: configurations.yaml)')
+    parser.add_argument('-p', '--persistence', action='store_true', 
+                        help='use to avoid to clean existing database')
+    parser.add_argument('-fp', '--fakepublisher', action='store_true', 
+                        help='Run the mqtt fake publisher')
 
     args = parser.parse_args()
     config = {}
     if args.config:
-        filename = args.config #os.path.join(os.path.dirname(__file__), args.config)
+        filename = args.config 
+        # os.path.join(os.path.dirname(__file__), args.config)
     else:
-        filename = 'configurations.yaml' #os.path.join(os.path.dirname(__file__), 'configurations.yaml')
+        filename = 'configurations.yaml' 
+        # os.path.join(os.path.dirname(__file__), 'configurations.yaml')
     try:
         with open(filename, 'r') as f:
             config = yaml.load(f)

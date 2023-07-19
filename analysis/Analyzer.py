@@ -2,8 +2,12 @@ from threading import Thread, current_thread
 
 from analysis.DBhandler import DbHandler
 from analysis.localization import analyze
-
-
+import logging
+    # logging.basicConfig(level=logging.INFO,
+    #       format="[%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
+    #       # format="[%(asctime)s][%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
+    #       # datefmt="%Y-%m-%d %H:%M:%S",
+    #       )
 class Analyzer:
     def __init__(self, queue, cv, config, db_persistence=False):
         self.config = config
@@ -30,11 +34,11 @@ class Analyzer:
         t = current_thread()
         entries = []
         while getattr(t, "do_run", True):
-            print("Analyzer running")
+            logging.debug("Analyzer running")
             with self.cv:
-                print("Analyzer go to sleep")
+                logging.debug("Analyzer go to sleep")
                 self.cv.wait_for(lambda: not queue.empty() or not getattr(t, "do_run", True), timeout=5)
-            print("Analyzer woke up")
+            logging.debug("Analyzer woke up")
             while not queue.empty():
                 try:
                     time_frame_analysis = queue.get(timeout=2)
@@ -47,7 +51,7 @@ class Analyzer:
 
                 entries += analyzed_entries
             # If there is at least something to send, i send data to database
-            print("is there something to send to the database?")
+            logging.debug("is there something to send to the database?")
             if len(entries) > 0:
                 print("YES, there is something to send to the database")
                 try:

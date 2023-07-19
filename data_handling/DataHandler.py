@@ -1,5 +1,6 @@
 from data_handling.RoomAnalysis import RoomAnalysis
 from threading import Lock
+import logging
 
 class DataHandler:
     def __init__(self, queue, cv, config):
@@ -17,10 +18,9 @@ class DataHandler:
     def put(self, topic, payload):
         #DEBUG
         print(" ")
-        print("MQTT Data Received...")
-        print("MQTT Topic: " + topic)
-        print("Data: " + payload)
-        print("")
+        logging.info("MQTT Data Received...")
+        logging.info(f'MQTT Topic: ["{topic}"]')
+        logging.info(f'Data: \n{payload}\n')
 
         roomId, espId = topic.split("/")[1:3]
         # topic ETS\%room\%esp:

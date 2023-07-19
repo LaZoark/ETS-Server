@@ -7,12 +7,13 @@ class MQTTListener():
     def __init__(self, queue, cv, config):
         self.config = config
         print("Creating MQTT Obj")
-        
+
         # the data handler is initialized
         self.dataHandler = DataHandler(queue, cv, config)
 
         # mqtt client is configured
-        self.mqttc = mqtt.Client(client_id=self.config['MQTT_username_listener'], transport='websockets')
+        self.mqttc = mqtt.Client(client_id=self.config['MQTT_username_listener'],
+                                 transport='tcp')
         self.mqttc.on_message = self.on_message
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_subscribe = self.on_subscribe
@@ -32,8 +33,11 @@ class MQTTListener():
     def start(self):
         # Connect
         print("connecting to: ", self.config["MQTT_Broker"], "on port ", self.config["MQTT_Port"])
-        self.mqttc.username_pw_set(username=self.config['MQTT_username_listener'])
-        self.mqttc.connect(self.config["MQTT_Broker"], self.config["MQTT_Port"], self.config["Keep_Alive_Interval"])
+        self.mqttc.username_pw_set(username=self.config['MQTT_username_listener'],
+                                   password=self.config['MQTT_password_listener'])
+        self.mqttc.connect(self.config["MQTT_Broker"],
+                           self.config["MQTT_Port"],
+                           self.config["Keep_Alive_Interval"])
         self.mqttc.loop_forever()
 
     def stop(self):
