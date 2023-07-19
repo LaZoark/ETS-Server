@@ -51,11 +51,11 @@ class Analyzer:
             # If there is at least something to send, i send data to database
             logging.debug("is there something to send to the database?")
             if len(entries) > 0:
-                logging.info("YES, there is something to send to the database")
+                logging.debug("YES, there is something to send to the database")
                 try:
                     logging.debug(f"{self.db_persistence=}")
                     with DbHandler(self.config, persistence=self.db_persistence) as dh:
-                        logging.info("Connection is ok.")
+                        logging.debug("Connection is ok")
                         dh.insert(entries)
                         logging.info("Data inserted to the database with success")
                         entries = []

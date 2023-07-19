@@ -10,7 +10,7 @@ class DbHandler:
         self.persistence = persistence
 
     def __enter__(self):
-        logging.info("[DB] Connecting to database...")
+        logging.debug("[DB] Connecting to database...")
         if self.persistence:
             try:
                 self.mydb = mysql.connector.connect(
