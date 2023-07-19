@@ -1,19 +1,9 @@
 import argparse
 import yaml
 import threading
-# import logging
 from color_log import color
 logging = color.setup(name='Sniffer', level=color.DEBUG)
 from server.EtsServer import EtsServer
-
-# # TODO: 
-# # The following part should move to another file for the maintenance purpose
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     format="[%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
-#     # format="[%(asctime)s][%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
-#     # datefmt="%Y-%m-%d %H:%M:%S",
-#     )
 
 
 
@@ -24,12 +14,13 @@ def main(config, persistence, fake):
     ets.start()
     go = True
     while go:
-        # a = input("type 'stop' to stop the server.\n")
         logging.info("Typing 'stop' to terminate the server.")
-        a = input()
-        logging.debug(f"{'='*30} {a} {'='*30}")
-        if a == "stop":
+        cli_command = input()
+        logging.debug(f"{'='*30} {cli_command} {'='*30}")
+        if cli_command == "stop":
             go = False
+        else:
+            logging.critical('FUNCTION NOT ALLOWED')
     ets.stop()
 
 
