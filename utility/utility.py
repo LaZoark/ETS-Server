@@ -6,7 +6,7 @@
 
 def isLast(header):
     last = header.split(" ")[0]
-    print("is the last?: " + last)
+    # print("is the last?: " + last)
     if last == "T":
         return True
     else:
