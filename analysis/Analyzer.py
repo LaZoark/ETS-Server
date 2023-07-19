@@ -57,7 +57,7 @@ class Analyzer:
                     with DbHandler(self.config, persistence=self.db_persistence) as dh:
                         logging.debug("Connection is ok")
                         dh.insert(entries)
-                        logging.info("Data inserted to the database with success")
+                        logging.info("Data inserted to the database with success! Cleaning buffer...")
                         entries = []
                 except Exception as e:
                     logging.error("Unable to send entries, retrying the next time",

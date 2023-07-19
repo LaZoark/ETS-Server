@@ -9,7 +9,7 @@ from server.EtsServer import EtsServer
 
 def main(config, persistence, fake):
     # parameters initalization
-    logging.info(f"{persistence=}, {fake=}")
+    logging.warning(f"{persistence=}, {fake=}")
     ets = EtsServer(config, fake=fake, db_persistence=persistence)
     ets.start()
     go = True

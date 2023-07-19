@@ -1,7 +1,7 @@
 from copy import deepcopy
 from threading import Lock
 from color_log import color
-logging = color.setup(name=__name__, level=color.DEBUG)
+logging = color.setup(name=__name__, level=color.INFO)
 from data_handling.TimeFrameAnalysis import TimeFrameAnalysis
 from utility.utility import getTid
 
@@ -29,7 +29,7 @@ class RoomAnalysis:
         if espTid < self.currTid:
             logging.info("Old packet, all the packets captured that are written into it will not be be analyzed")
         elif espTid == self.currTid:
-            logging.info(f"for [{espTid=}]: packets were sent, check if it is the last one")
+            logging.debug(f"for [{espTid=}]: packets were sent, check if it is the last one")
             if self.currentAnalysisData.putRows(espId, header, rows):
                 logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
                 self.putDataQueue()
