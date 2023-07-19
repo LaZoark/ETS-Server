@@ -38,8 +38,6 @@ class DbHandler:
                 self.mycursor = self.mydb.cursor()
                 return self
             except Exception as e:
-                # print(e)
-                # raise Exception("[DB] Unable to connect.")
                 logging.error(f"[DB] Unable to connect. #{e}")
 
     def createDatabase(self):

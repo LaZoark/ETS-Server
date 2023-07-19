@@ -24,7 +24,7 @@ class MQTTListener():
     # Subscribe to all Sensors at Base Topic
     def on_connect(self, mqttc, obj, flags, rc):
         mqttc.subscribe(self.config["MQTT_Topic"], 0)
-        logging.info(f'Connected to {self.config["MQTT_Broker"]}:{self.config["MQTT_Port"]}')
+        logging.info(f'''Connected to "{self.config["MQTT_Broker"]}:{self.config["MQTT_Port"]}"''')
     
     def on_subscribe(self, mosq, obj, mid, granted_qos):
         logging.info("Client successfully subscribed to topic")
@@ -34,7 +34,7 @@ class MQTTListener():
 
     def start(self):
         # Connect
-        logging.info(f'Connecting to {self.config["MQTT_Broker"]}:{self.config["MQTT_Port"]}...')
+        logging.info(f'''Connecting to "{self.config["MQTT_Broker"]}:{self.config["MQTT_Port"]}"...''')
         self.mqttc.username_pw_set(username=self.config['MQTT_username_listener'],
                                    password=self.config['MQTT_password_listener'])
         self.mqttc.connect(self.config["MQTT_Broker"],

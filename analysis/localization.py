@@ -56,13 +56,13 @@ def getXY(room_id, rssi_measures, esp_ids, config):
             x = local * x_dest + (1 - local) * x_src
             y = local * y_dest + (1 - local) * y_src
             # DEBUG
-            # print("x, y : ", x, y, "\n\n")
-            # print("Source x,y: ", x_src, y_src, " Destionation: ", x_dest, y_dest)
-            # print("Local coordinate: ", local)
+            # logging.debug("x, y : ", x, y, "\n\n")
+            # logging.debug("Source x,y: ", x_src, y_src, " Destionation: ", x_dest, y_dest)
+            # logging.debug("Local coordinate: ", local)
             num_measures += 1
 
             results.append((x, y))
-        print(results)
+        logging.info(results)
         final_result = reduce(lambda val_1, val_2: (val_1[0] + val_2[0], val_1[1] + val_2[1]), results)
         # Some pruning can be done before to send data to database
         return final_result[0] / num_measures, final_result[1] / num_measures
@@ -110,9 +110,8 @@ def get_trilateration(measure1, measure2, measure3, type='circumference'):
             r2 = getD(r2)
             r3 = getD(r3)
         except Exception as e:
-            print(e)
-            print('Error while parsing measures')
-            print(measure1, measure2, measure3)
+            logging.error('Error while parsing measures', exc_info=e)
+            logging.error(f'{measure1=}, {measure2=}, {measure3=}')
             return -1., -1.
         a12 = geta(x1, y1, r1, x2, y2, r2)
         a13 = geta(x1, y1, r1, x3, y3, r3)
@@ -121,7 +120,7 @@ def get_trilateration(measure1, measure2, measure3, type='circumference'):
             xp = (a12 * (y1 - y3) - a13 * (y1 - y2)) / (2 * ((y1 - y2) * (x1 - x3) - (x1 - x2) * (y1 - y3)))
             yp = (a12 * (x1 - x3) - a13 * (x1 - x2)) / (2 * ((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)))
         except Exception as e:
-            print(e)
+            logging.error(e)
             xp, yp = -1, -1
 
         return xp, yp
@@ -137,13 +136,13 @@ def get_trilateration_local_coordinate(rssi, config, type_measure='0-1_mapping')
             z_max = float(abs(config['z_max'])) ** (1. / 1.)
             z_off = float(config['z_off'])
         except Exception as e:
-            print('parameter z_off or z1 or z0 not set')
+            logging.error('parameter z_off or z1 or z0 not set')
             return -1., -1.
         z = (abs(rssi - z_off)) ** (1. / 1.)
 
-        #print(z)
-        #m = 1. / (z_1 - z_0)
-        #local_coordinate = m * (z - z_0)
+        # logging.debug(z)
+        # m = 1. / (z_1 - z_0)
+        # local_coordinate = m * (z - z_0)
         local_coordinate = z / z_max
         return round(local_coordinate, 3)
     else:
@@ -181,13 +180,13 @@ def getXY_new(room_id, rssi_measures, esp_ids, config):
         x = local * x_dest + (1 - local) * x_src
         y = local * y_dest + (1 - local) * y_src
         # DEBUG
-        # print("x, y : ", x, y, "\n\n")
-        # print("Source x,y: ", x_src, y_src, " Destionation: ", x_dest, y_dest)
-        # print("Local coordinate: ", local)
+        # logging.debug("x, y : ", x, y, "\n\n")
+        # logging.debug("Source x,y: ", x_src, y_src, " Destionation: ", x_dest, y_dest)
+        # logging.debug("Local coordinate: ", local)
         num_measures += 1
 
         results.append((x, y))
-    print(results)
+    logging.info(results)
     final_result = reduce(lambda val_1, val_2: (val_1[0]+val_2[0], val_1[1]+val_2[1]), results)
     # Some pruning can be done before to send data to database
     return final_result[0] / num_measures, final_result[1] / num_measures
@@ -203,7 +202,7 @@ def analyze(time_frame_analysis, config):
     room_id = time_frame_analysis.roomid
 
     # DEBUG
-    print("sniffed packet ready to be analyzed")
+    logging.debug("sniffed packet ready to be analyzed")
     fd = time_frame_analysis.getDataFrame()
 
     grouped_fd = fd.groupby(['HASH'])

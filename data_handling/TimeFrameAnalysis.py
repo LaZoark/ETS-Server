@@ -42,7 +42,7 @@ class TimeFrameAnalysis:
         # If it's the last of the minute timestamp, i increase the counter of completed frames
         # If all the packets of all ESP32 were sent, i put return True in order to put them into the queue
         if isLast(header):
-            logging.info(f"Packet from [{espId=}]. Timestamp={header.split(' ')[1]}, the last one of the timestamp")
+            logging.info(f"Last packet sent from [{espId=}]. (Timestamp={header.split(' ')[1]})")
             self.nCompleted = self.nCompleted + 1
             logging.info(f"Actual number of bunch of data: {self.nCompleted}, Waiting: {self.numEsp}")
             if self.nCompleted == self.numEsp:
