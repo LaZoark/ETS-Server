@@ -7,7 +7,7 @@ from server.EtsServer import EtsServer
 # TODO: 
 # The following part should move to another file for the maintenance purpose
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="[%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
     # format="[%(asctime)s][%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
     # datefmt="%Y-%m-%d %H:%M:%S",
@@ -17,13 +17,12 @@ logging.basicConfig(
 
 def main(config, persistence, fake):
     # parameters initalization
-    # print("persistence = ", persistence, "Fake publish = ", fake)
-    logging.info(f"{persistence = }, Fake publish = {fake}")
+    logging.info(f"{persistence=}, {fake=}")
     ets = EtsServer(config, fake=fake, db_persistence=persistence)
     ets.start()
     go = True
     while go:
-        a = input("type stop to stop\n")
+        a = input("type 'stop' to stop the server.\n")
         print(a)
         if a == "stop":
             go = False
