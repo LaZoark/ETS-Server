@@ -33,7 +33,9 @@ class Analyzer:
             logging.debug("Analyzer running")
             with self.cv:
                 logging.debug("Analyzer go to sleep")
-                self.cv.wait_for(lambda: not queue.empty() or not getattr(t, "do_run", True), timeout=5)
+                self.cv.wait_for(
+                    lambda: not queue.empty() or not getattr(t, "do_run", True), 
+                    timeout=5)
             logging.debug("Analyzer woke up")
             while not queue.empty():
                 try:
@@ -53,13 +55,11 @@ class Analyzer:
                 try:
                     logging.debug(f"{self.db_persistence=}")
                     with DbHandler(self.config, persistence=self.db_persistence) as dh:
-                        # logging.info("Connected to database")
-                        logging.info("Connecting to database")
+                        logging.info("Connection is ok.")
                         dh.insert(entries)
                         logging.info("Data inserted to the database with success")
                         entries = []
                 except Exception as e:
-                    # print(e)
                     logging.error("Unable to send entries, retrying the next time",
                                   exc_info=e)
 

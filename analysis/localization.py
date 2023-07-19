@@ -4,7 +4,7 @@ from itertools import combinations
 from functools import reduce
 from statistics import mean
 from color_log import color
-logging = color.setup(name=__name__, level=color.DEBUG)
+logging = color.setup(name=__name__, level=color.INFO)
 
 def getD(rssi, d0 = 1, n = 5.4,a = -41):
     return d0 * 10 ** ((a - rssi) / (n * 10))
@@ -214,12 +214,13 @@ def analyze(time_frame_analysis, config):
 
         rssi_measurements = device_fd['RSSI'].tolist()
         esp_ids = device_fd['ESPID'].tolist()
-        logging.warning(f'{esp_ids = }')
+        logging.debug(f'{esp_ids = }')
         if len(rssi_measurements) == num_esp:
             #x, y = getXY_new(room_id, rssi_measurements, esp_ids, config)
             x, y = getXY(room_id, rssi_measurements, esp_ids, config)
             mac = device_fd['MAC'].tolist()[0]
-            hash = device[0]
+            # hash = device[0]
+            hash = device[0][0]
             tid = int(device_fd['TIMESTAMP'].tolist()[0])
             sn = device_fd['SN'].tolist()[0]
             htci = device_fd['HTCI'].tolist()[0]

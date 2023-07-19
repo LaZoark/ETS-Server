@@ -1,7 +1,7 @@
 import mysql.connector
 # from mysql.connector import errorcode
 from color_log import color
-logging = color.setup(name=__name__, level=color.DEBUG)
+logging = color.setup(name=__name__, level=color.INFO)
 
 class DbHandler:
 
@@ -62,7 +62,7 @@ class DbHandler:
                                       "primary key (TID, HASH)"
                                       ")")
             except Exception as e:
-                logging.error(e)
+                logging.fatal(e)
                 exit(1)
         logging.info("table created/reset with success")
 
@@ -72,11 +72,12 @@ class DbHandler:
         sql_formula = "INSERT INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         try:
             mycursor.execute("USE pds")
-            logging.info(f"Trying to insert this: {value}")
+            logging.debug(f"Trying to insert this: {value}")
             mycursor.executemany(sql_formula, value)
             self.mydb.commit()
         except Exception as e:
-            logging.error(e)
+            # logging.error(e)
+            logging.error('Something went wrong', exc_info=e)
             self.mydb.rollback()
             raise e
         mycursor.close()
