@@ -51,5 +51,5 @@ class RoomAnalysis:
             self.cv.wait(timeout=4)
             with self.lock:
                 self.queue.put(deepcopy(self.currentAnalysisData))
-            print(self.queue)
+            logging.debug(f'{self.queue = }')
             self.cv.notify_all()
