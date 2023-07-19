@@ -2,12 +2,9 @@ from threading import Thread, current_thread
 
 from analysis.DBhandler import DbHandler
 from analysis.localization import analyze
-import logging
-    # logging.basicConfig(level=logging.INFO,
-    #       format="[%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
-    #       # format="[%(asctime)s][%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
-    #       # datefmt="%Y-%m-%d %H:%M:%S",
-    #       )
+from color_log import color
+logging = color.setup(name=__name__, level=color.INFO)
+
 class Analyzer:
     def __init__(self, queue, cv, config, db_persistence=False):
         self.config = config
@@ -23,11 +20,10 @@ class Analyzer:
                 with DbHandler(self.config, self.db_persistence) as dh:
                     dh.createDatabase()
                     dh.createTable()
-                    print("Connected to database")
-                    print("Created Table and Database")
+                    logging.info("Connected to database")
+                    logging.info("Created Table and Database")
             except Exception as e:
-                print(e)
-                print("Unable to connect do database")
+                logging.error(f"Unable to connect to database", exc_info=e)
         self.thread.start()
 
     def run(self, queue):
@@ -43,7 +39,7 @@ class Analyzer:
                 try:
                     time_frame_analysis = queue.get(timeout=2)
                 except Exception as e:
-                    print(e)
+                    logging.error(e)
                     continue
                 queue.task_done()
 
@@ -53,20 +49,22 @@ class Analyzer:
             # If there is at least something to send, i send data to database
             logging.debug("is there something to send to the database?")
             if len(entries) > 0:
-                print("YES, there is something to send to the database")
+                logging.info("YES, there is something to send to the database")
                 try:
-                    print(self.db_persistence)
+                    logging.debug(f"{self.db_persistence=}")
                     with DbHandler(self.config, persistence=self.db_persistence) as dh:
-                        print("Connected to database")
+                        # logging.info("Connected to database")
+                        logging.info("Connecting to database")
                         dh.insert(entries)
-                        print("Data inserted to the database with success")
+                        logging.info("Data inserted to the database with success")
                         entries = []
                 except Exception as e:
-                    print(e)
-                    print("Unable to send entries, retrying the next time")
+                    # print(e)
+                    logging.error("Unable to send entries, retrying the next time",
+                                  exc_info=e)
 
     def stop(self):
-        print("Stopping Analyzer!")
+        logging.info("Stopping Analyzer!")
         self.thread.do_run = False
         with self.cv:
             self.cv.notify()

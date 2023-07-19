@@ -1,6 +1,7 @@
 import mysql.connector
 # from mysql.connector import errorcode
-import logging
+from color_log import color
+logging = color.setup(name=__name__, level=color.DEBUG)
 
 class DbHandler:
 
@@ -61,7 +62,7 @@ class DbHandler:
                                       "primary key (TID, HASH)"
                                       ")")
             except Exception as e:
-                print(e)
+                logging.error(e)
                 exit(1)
         logging.info("table created/reset with success")
 
@@ -75,7 +76,7 @@ class DbHandler:
             mycursor.executemany(sql_formula, value)
             self.mydb.commit()
         except Exception as e:
-            print(e)
+            logging.error(e)
             self.mydb.rollback()
             raise e
         mycursor.close()

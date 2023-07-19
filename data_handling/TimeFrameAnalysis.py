@@ -1,4 +1,6 @@
 import pandas as pd
+from color_log import color
+logging = color.setup(name=__name__, level=color.INFO)
 
 from utility.utility import isLast
 
@@ -36,13 +38,13 @@ class TimeFrameAnalysis:
                 entry.insert(0, espId)
                 self.entries.append(entry)
             else:
-                print('Invalid entry: ', entry)
+                logging.info(f'Invalid entry: {entry}')
         # If it's the last of the minute timestamp, i increase the counter of completed frames
         # If all the packets of all ESP32 were sent, i put return True in order to put them into the queue
         if isLast(header):
-            print("Packet from" + espId + " Timestamp " + header.split(" ")[1] + ", the last one of the timestamp\n")
+            logging.info(f"Packet from [{espId=}]. Timestamp={header.split(' ')[1]}, the last one of the timestamp")
             self.nCompleted = self.nCompleted + 1
-            print("Actual number of bunch of data: ", self.nCompleted, " To wait: ", self.numEsp)
+            logging.info(f"Actual number of bunch of data: {self.nCompleted}, Waiting: {self.numEsp}")
             if self.nCompleted == self.numEsp:
                 return True
         return False

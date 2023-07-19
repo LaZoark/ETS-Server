@@ -1,17 +1,19 @@
 import argparse
 import yaml
 import threading
-import logging
+# import logging
+from color_log import color
+logging = color.setup(name='Sniffer', level=color.DEBUG)
 from server.EtsServer import EtsServer
 
-# TODO: 
-# The following part should move to another file for the maintenance purpose
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="[%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
-    # format="[%(asctime)s][%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
-    # datefmt="%Y-%m-%d %H:%M:%S",
-    )
+# # TODO: 
+# # The following part should move to another file for the maintenance purpose
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format="[%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
+#     # format="[%(asctime)s][%(levelname)s] %(message)s (%(filename)s:%(lineno)d)",
+#     # datefmt="%Y-%m-%d %H:%M:%S",
+#     )
 
 
 
@@ -22,8 +24,10 @@ def main(config, persistence, fake):
     ets.start()
     go = True
     while go:
-        a = input("type 'stop' to stop the server.\n")
-        print(a)
+        # a = input("type 'stop' to stop the server.\n")
+        logging.info("Typing 'stop' to terminate the server.")
+        a = input()
+        logging.debug(f"{'='*30} {a} {'='*30}")
         if a == "stop":
             go = False
     ets.stop()
@@ -48,9 +52,9 @@ if __name__ == '__main__':
         # os.path.join(os.path.dirname(__file__), 'configurations.yaml')
     try:
         with open(filename, 'r') as f:
-            config = yaml.load(f)
+            config = yaml.load(f, yaml.FullLoader)
     except Exception as e:
-        print(e)
+        logging.critical(e)
         exit(-1)
     main(config, True if args.persistence else False, True if args.fakepublisher else False)
 

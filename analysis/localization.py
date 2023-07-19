@@ -3,6 +3,8 @@ from math import sqrt
 from itertools import combinations
 from functools import reduce
 from statistics import mean
+from color_log import color
+logging = color.setup(name=__name__, level=color.DEBUG)
 
 def getD(rssi, d0 = 1, n = 5.4,a = -41):
     return d0 * 10 ** ((a - rssi) / (n * 10))
@@ -212,6 +214,7 @@ def analyze(time_frame_analysis, config):
 
         rssi_measurements = device_fd['RSSI'].tolist()
         esp_ids = device_fd['ESPID'].tolist()
+        logging.warning(f'{esp_ids = }')
         if len(rssi_measurements) == num_esp:
             #x, y = getXY_new(room_id, rssi_measurements, esp_ids, config)
             x, y = getXY(room_id, rssi_measurements, esp_ids, config)
