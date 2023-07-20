@@ -30,7 +30,10 @@ class MQTTListener():
         logging.info("Client successfully subscribed to topic")
 
     def on_message(self, mosq, obj, msg):
-        self.dataHandler.put(str(msg.topic), str(msg.payload.decode("UTF-8")))
+        try:
+            self.dataHandler.put(str(msg.topic), str(msg.payload.decode("UTF-8")))
+        except:
+            logging.fatal(f'Skipping! Unable to handle: [{msg = }]')
 
     def start(self):
         # Connect
