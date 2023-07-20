@@ -38,7 +38,8 @@ class TimeFrameAnalysis:
                 entry.insert(0, espId)
                 self.entries.append(entry)
             else:
-                logging.info(f'Invalid entry: {entry}')
+                logging.warning(f'Invalid entry: {entry} {len(entry[0])=} \nCleaning...')
+                entry = []
         # If it's the last of the minute timestamp, i increase the counter of completed frames
         # If all the packets of all ESP32 were sent, i put return True in order to put them into the queue
         if isLast(header):
