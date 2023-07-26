@@ -6,22 +6,25 @@ from color_log import color
 logging = color.setup(name=__name__, level=color.INFO)
 
 class Analyzer:
-    def __init__(self, queue, cv, config, db_persistence=False):
+    def __init__(self, queue, cv, config, db_persistence=False, log_level: int=color.DEBUG):
         self.config = config
 
         self.queue = queue
         self.cv = cv
         self.db_persistence = db_persistence
         self.thread = Thread(target=self.run, args=(self.queue,))
+        self.log_level_sub = log_level
+        logging.setLevel(log_level)
 
     def start(self):
         if not self.db_persistence:
             try:
-                with DbHandler(self.config, self.db_persistence) as dh:
+                with DbHandler(self.config, persistence=self.db_persistence, log_level=self.log_level_sub) as dh:
                     dh.createDatabase()
                     dh.createTable()
                     logging.info("Connected to database")
                     logging.info("Created Table and Database")
+                    
             except Exception as e:
                 logging.error(f"Unable to connect to database", exc_info=e)
         self.thread.start()
@@ -54,7 +57,7 @@ class Analyzer:
                 logging.debug("YES, there is something to send to the database")
                 try:
                     logging.debug(f"{self.db_persistence=}")
-                    with DbHandler(self.config, persistence=self.db_persistence) as dh:
+                    with DbHandler(self.config, persistence=self.db_persistence, log_level=self.log_level_sub) as dh:
                         logging.debug("Connection is ok")
                         dh.insert(entries)
                         logging.info("Data inserted to the database with success! Cleaning buffer...")

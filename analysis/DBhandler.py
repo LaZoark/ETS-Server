@@ -1,13 +1,13 @@
 import mysql.connector
 # from mysql.connector import errorcode
 from color_log import color
-logging = color.setup(name=__name__, level=color.INFO)
+logging = color.setup(name=__name__, level=color.DEBUG)
 
 class DbHandler:
-
-    def __init__(self, config, persistence=False):
+    def __init__(self, config, persistence=False, log_level: int=color.DEBUG):
         self.config = config
         self.persistence = persistence
+        logging.setLevel(log_level)
 
     def __enter__(self):
         logging.debug("[DB] Connecting to database...")
@@ -74,7 +74,6 @@ class DbHandler:
             mycursor.executemany(sql_formula, value)
             self.mydb.commit()
         except Exception as e:
-            # logging.error(e)
             logging.error('Something went wrong', exc_info=e)
             self.mydb.rollback()
             raise e

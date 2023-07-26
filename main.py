@@ -19,6 +19,10 @@ def main(config, persistence, fake):
         logging.debug(f"{'='*30} {cli_command} {'='*30}")
         if cli_command == "stop":
             go = False
+        elif cli_command == "debug off":
+            ets.debug_off()
+        elif cli_command == "debug on":
+            ets.debug_on()
         else:
             logging.critical('FUNCTION NOT ALLOWED')
     ets.stop()

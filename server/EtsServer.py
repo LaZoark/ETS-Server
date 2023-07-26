@@ -1,6 +1,7 @@
 from queue import Queue
 from threading import Lock, Condition, Thread
 from time import sleep
+from color_log import color
 
 from analysis.Analyzer import Analyzer
 from mqtt import MQTTFakePublisher
@@ -24,10 +25,13 @@ class EtsServer:
         self.q = Queue()
         self.cv = Condition()
         self.fake = fake
+        self.log_level = color.DEBUG
+        self._config = config
+        self._persist = db_persistence
 
         # classes
-        self.mqttl = MQTTListener(self.q, self.cv, config)
-        self.analyzer = Analyzer(self.q, self.cv, config, db_persistence)
+        self.mqttl = MQTTListener(self.q, self.cv, config, log_level=self.log_level)
+        self.analyzer = Analyzer(self.q, self.cv, config, db_persistence, log_level=self.log_level)
         if fake:
             self.mqttfp = MQTTFakePublisher(config)
 
@@ -54,4 +58,37 @@ class EtsServer:
         if self.fake:
             self.thread_mqttfp.join()
         self.thread_mqttl.join()
+    
+    def debug_off(self):        
+        if self.log_level == color.DEBUG:
+            self.analyzer.stop()
+            self.mqttl.stop()
+            self.thread_mqttl.join()
+            
+            self.log_level = color.INFO
+            self.mqttl = MQTTListener(self.q, self.cv, self._config, log_level=self.log_level)
+            self.analyzer = Analyzer(self.q, self.cv, self._config, self._persist, log_level=self.log_level)
+            self.thread_mqttl = Thread(target=run_mqtt, args=(self.mqttl,))
+            
+            self.analyzer.start()
+            self.thread_mqttl.start()
+            print('DEBUG was turned off.')
+        else:
+            print('DEBUG is already off.')
 
+    def debug_on(self):
+        if self.log_level != color.DEBUG:
+            self.analyzer.stop()
+            self.mqttl.stop()
+            self.thread_mqttl.join()
+
+            self.log_level = color.DEBUG
+            self.mqttl = MQTTListener(self.q, self.cv, self._config, log_level=self.log_level)
+            self.analyzer = Analyzer(self.q, self.cv, self._config, self._persist, log_level=self.log_level)
+            self.thread_mqttl = Thread(target=run_mqtt, args=(self.mqttl,))
+            
+            self.analyzer.start()
+            self.thread_mqttl.start()
+            print('DEBUG was turned on.')
+        else:
+            print('DEBUG is already on.')
