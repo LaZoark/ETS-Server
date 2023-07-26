@@ -1,7 +1,7 @@
 from copy import deepcopy
 from threading import Lock
 from color_log import color
-logging = color.setup(name=__name__, level=color.INFO)
+logging = color.setup(name=__name__, level=color.DEBUG)
 from data_handling.TimeFrameAnalysis import TimeFrameAnalysis
 from utility.utility import getTid
 
@@ -23,6 +23,7 @@ class RoomAnalysis:
 
 
     def putData(self, espId, header, rows):
+        '''This function will calibration the TID(Time ID) whenever the data received'''
         espTid = getTid(header)
         # DEBUG
         # print("Trying to take the lock for the room: ",self.roomId)
@@ -33,7 +34,7 @@ class RoomAnalysis:
             if self.currentAnalysisData.putRows(espId, header, rows):
                 logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
                 self.putDataQueue()
-                self.currTid += 60
+                self.currTid += self.config['Sniffing_time']
                 with self.lock:
                     self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
 
