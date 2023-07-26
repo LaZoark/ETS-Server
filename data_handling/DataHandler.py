@@ -20,10 +20,12 @@ class DataHandler:
         #DEBUG
         logging.info("MQTT Data Received...")
         logging.info(f'MQTT Topic: ["{topic}"]')
-        # logging.info(f'Data: \n{payload}')
         logging.info(f'Data: {payload}')
 
         roomId, espId = topic.split("/")[1:3]
+        if espId not in self.config["room"]["1"]["EspCoor"]:
+            logging.error(f'[{espId = }], but expect: {self.config["room"]["1"]["EspCoor"]}')
+            raise NameError(f'{espId = }')
         # topic ETS\%room\%esp:
         if roomId not in self.rooms:
             self.rooms[roomId] = RoomAnalysis(roomId, self.queue, self.cv, self.config)

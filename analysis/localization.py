@@ -25,6 +25,14 @@ def getXY(room_id, rssi_measures, esp_ids, config):
         y_esp = float(config["room"][room_id]["EspCoor"][espid]["Y"])
         d = int(rssi)
         measures.append((x_esp, y_esp, d))
+        # try:
+        #     x_esp = float(config["room"][room_id]["EspCoor"][espid]["X"])
+        #     y_esp = float(config["room"][room_id]["EspCoor"][espid]["Y"])
+        #     d = int(rssi)
+        #     measures.append((x_esp, y_esp, d))
+        # except Exception as e:
+        #     logging.error(f'[{espid = }], {e}')
+        #     break
 
     # calculate x and y
     if len(measures) == 1:
@@ -62,7 +70,7 @@ def getXY(room_id, rssi_measures, esp_ids, config):
             num_measures += 1
 
             results.append((x, y))
-        logging.info(results)
+        logging.debug(results)
         final_result = reduce(lambda val_1, val_2: (val_1[0] + val_2[0], val_1[1] + val_2[1]), results)
         # Some pruning can be done before to send data to database
         return final_result[0] / num_measures, final_result[1] / num_measures
@@ -163,6 +171,14 @@ def getXY_new(room_id, rssi_measures, esp_ids, config):
         y_esp = float(config["room"][room_id]["EspCoor"][espid]["Y"])
         rssi = int(rssi)
         measures.append((x_esp, y_esp, rssi))
+        # try:
+        #     x_esp = float(config["room"][room_id]["EspCoor"][espid]["X"])
+        #     y_esp = float(config["room"][room_id]["EspCoor"][espid]["Y"])
+        #     rssi = int(rssi)
+        #     measures.append((x_esp, y_esp, rssi))
+        # except Exception as e:
+        #     logging.error(f'[{espid = }], {e}')
+        #     break
 
     for measure in measures:
         if measure[2] < -100:
@@ -186,7 +202,7 @@ def getXY_new(room_id, rssi_measures, esp_ids, config):
         num_measures += 1
 
         results.append((x, y))
-    logging.info(results)
+    logging.debug(results)
     final_result = reduce(lambda val_1, val_2: (val_1[0]+val_2[0], val_1[1]+val_2[1]), results)
     # Some pruning can be done before to send data to database
     return final_result[0] / num_measures, final_result[1] / num_measures

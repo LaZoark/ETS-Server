@@ -6,7 +6,7 @@ from data_handling.DataHandler import DataHandler
 
 
 class MQTTListener():
-    def __init__(self, queue, cv, config):
+    def __init__(self, queue, cv, config, log_level: int=color.DEBUG):
         self.config = config
         logging.info("Creating MQTT Obj")
 
@@ -19,6 +19,7 @@ class MQTTListener():
         self.mqttc.on_message = self.on_message
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_subscribe = self.on_subscribe
+        logging.setLevel(log_level)
 
 
     # Subscribe to all Sensors at Base Topic
@@ -32,8 +33,8 @@ class MQTTListener():
     def on_message(self, mosq, obj, msg):
         try:
             self.dataHandler.put(str(msg.topic), str(msg.payload.decode("UTF-8")))
-        except:
-            logging.fatal(f'Skipping! Unable to handle: [{msg = }]')
+        except Exception as e:
+            logging.fatal(f'Skipping! Unable to handle: [{msg.topic = }] {e}')
 
     def start(self):
         # Connect
