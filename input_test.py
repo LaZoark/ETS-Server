@@ -2,22 +2,21 @@ from color_log import color
 logging = color.setup(name='Sniffer', level=color.DEBUG)
 
 
-from pynput import keyboard
-from pynput.keyboard import Key
+import keyboard
 
 import sys
 
-def on_key_release(key):
-  if key == Key.right:
-    print("Right key clicked")
-  elif key == Key.left:
-    print("Left key clicked")
-  elif key == Key.up:
-    print("Up key clicked")
-  elif key == Key.down:
-    print("Down key clicked")
-  elif key == Key.esc:
-    exit()
+# def on_key_release(key):
+#   if key == Key.right:
+#     print("Right key clicked")
+#   elif key == Key.left:
+#     print("Left key clicked")
+#   elif key == Key.up:
+#     print("Up key clicked")
+#   elif key == Key.down:
+#     print("Down key clicked")
+#   elif key == Key.esc:
+#     exit()
 
 
 def main():
@@ -26,11 +25,15 @@ def main():
   _lock_cli: bool = True
   go = True
   logging.info("Typing 'stop' to terminate the server.")
+
   while go:
     _input_str = ""
+    keyboard.add_abbreviation("@", "john@stackabuse.com")
     while True:
-      c = sys.stdin.read(1) # reads one byte at a time, similar to getchar()
-      if keyboard.Key.up():
+      if keyboard.is_pressed('up'):
+        print("keyboard.is_pressed('up'):")
+        
+        keyboard.p
         _lock_cli = False
         hist_iter_flag += 1
         if len(cli_history)>=hist_iter_flag:
@@ -42,19 +45,10 @@ def main():
           # sys.stdout.flush()
           # print('fffffffflush')
 
+      c = sys.stdin.read(1) # reads one byte at a time, similar to getchar()
 
-      # logging.info(f'{c = }')
-      # if c == '\x1b':
-      #   # if c == '[A':
-      #     hist_iter_flag += 1
-      #     if len(cli_history)>hist_iter_flag:
-      #       print(cli_history[-hist_iter_flag], end='')
-      #       _input_str = cli_history
-      #     else:
-      #       hist_iter_flag -= 1
       if c == '\n':
-        sys.stdout.flush()
-
+        # sys.stdout.flush()
         break
       _input_str += c
 
