@@ -7,7 +7,7 @@ import subprocess
 
 def main():
   # cli_history: list = []
-  cli_history: list = ['debug on', 'debug on all', 'debug off', 'debug off all']
+  cli_history: list = ['debug off', 'debug off all', 'debug on', 'debug on all']
   _lock_cli: bool = True
   _lock_input: bool = True
   go: bool = True

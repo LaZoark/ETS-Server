@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ETS Server')
     parser.add_argument('-c', '--config', default=None, type=str, 
                         help='config file path (default: configurations.yaml)')
-    parser.add_argument('-p', '--persistence', action='store_true', 
+    parser.add_argument('-p', '--persistence', default=True, action='store_true', 
                         help='use to avoid to clean existing database')
     parser.add_argument('-fp', '--fakepublisher', action='store_true', 
                         help='Run the mqtt fake publisher')
