@@ -13,8 +13,8 @@ def main(config, persistence, fake):
     ets = EtsServer(config, fake=fake, db_persistence=persistence)
     ets.start()
     go = True
+    logging.info("Typing 'stop' to terminate the server.")
     while go:
-        logging.info("Typing 'stop' to terminate the server.")
         cli_command = input()
         logging.debug(f"{'='*30} {cli_command} {'='*30}")
         if cli_command == "stop":
@@ -25,6 +25,7 @@ def main(config, persistence, fake):
             ets.debug_on()
         else:
             logging.critical('FUNCTION NOT ALLOWED')
+            logging.info("Typing 'stop' to terminate the server.")
     ets.stop()
 
 
