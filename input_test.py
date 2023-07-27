@@ -43,9 +43,11 @@ def main():
     elif cli_command == "debug off":
       _lock_cli = True
       logging.info('run "ets.debug_off()"')
+      # ets.debug_off()
     elif cli_command == "debug on":
       _lock_cli = True
       logging.info('run "ets.debug_on()"')
+      # ets.debug_on()
 
     elif cli_command[:4] == "hist":
       _lock_cli = True
