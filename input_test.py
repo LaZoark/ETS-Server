@@ -20,9 +20,10 @@ def on_key_release(key):
     exit()
 
 
-
-
 def main():
+  cli_history: list = []
+  hist_iter_flag: int = 0
+  _lock_cli: bool = True
   go = True
   logging.info("Typing 'stop' to terminate the server.")
   while go:
