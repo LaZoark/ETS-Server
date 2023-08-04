@@ -4,7 +4,7 @@ from time import sleep
 from color_log import color
 
 from analysis.Analyzer import Analyzer
-from mqtt import MQTTFakePublisher
+from mqtt import MQTTDummyPublisher
 from mqtt import MQTTListener
 
 
@@ -13,18 +13,18 @@ def run_mqtt(mqttclient):
     #mqttclient.loop()
 
 
-def run_mqtt_fake(mqttclient):
+def run_mqtt_dummy(mqttclient: MQTTDummyPublisher):
     mqttclient.start()
-    mqttclient.fake_pubblish("mqtt/sample_fakedata_1.csv")
+    mqttclient.dummy_pubblish("mqtt/sample_fakedata_1.csv")
 
 
 class EtsServer:
-    def __init__(self, config, fake=False, db_persistence=False):
+    def __init__(self, config, dummy=False, db_persistence=False):
 
         # variables for multithreading
         self.q = Queue()
         self.cv = Condition()
-        self.fake = fake
+        self.dummy = dummy
         self.log_level = color.DEBUG
         self._config = config
         self._persist = db_persistence
@@ -32,18 +32,18 @@ class EtsServer:
         # classes
         self.mqttl = MQTTListener(self.q, self.cv, config, log_level=self.log_level)
         self.analyzer = Analyzer(self.q, self.cv, config, db_persistence, log_level=self.log_level)
-        if fake:
-            self.mqttfp = MQTTFakePublisher(config)
+        if dummy:
+            self.mqttfp = MQTTDummyPublisher(config)
 
         # threads
         self.thread_mqttl = Thread(target=run_mqtt, args=(self.mqttl,))
-        if fake:
-            self.thread_mqttfp = Thread(target=run_mqtt_fake, args=(self.mqttfp,))
+        if dummy:
+            self.thread_mqttfp = Thread(target=run_mqtt_dummy, args=(self.mqttfp,))
 
     def start(self):
         self.analyzer.start()
         self.thread_mqttl.start()
-        if self.fake:
+        if self.dummy:
             sleep(1)
             self.thread_mqttfp.start()
 
@@ -51,11 +51,11 @@ class EtsServer:
         # we declare to stop everything
         self.analyzer.stop()
         self.mqttl.stop()
-        if self.fake:
+        if self.dummy:
             self.mqttfp.stop()
 
         # join threads
-        if self.fake:
+        if self.dummy:
             self.thread_mqttfp.join()
         self.thread_mqttl.join()
     

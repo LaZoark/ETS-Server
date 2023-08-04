@@ -8,10 +8,10 @@ import sys
 import subprocess
 
 
-def main(config, persistence, fake):
+def main(config, persistence, dummy):
   # parameters initalization
-  logging.warning(f"{persistence=}, {fake=}")
-  ets = EtsServer(config, fake=fake, db_persistence=persistence)
+  logging.warning(f"{persistence=}, {dummy=}")
+  ets = EtsServer(config, dummy=dummy, db_persistence=persistence)
   ets.start()
   cli_history: list = ['debug off', 'debug off all', 'debug on', 'debug on all']
   _lock_cli: bool = True
@@ -106,8 +106,8 @@ if __name__ == '__main__':
                       help='config file path (default: configurations.yaml)')
   parser.add_argument('-p', '--persistence', default=True, action='store_true', 
                       help='use to avoid to clean existing database')
-  parser.add_argument('-fp', '--fakepublisher', action='store_true', 
-                      help='Run the mqtt fake publisher')
+  parser.add_argument('-fp', '--dummy', action='store_true', 
+                      help='Run the mqtt dummy publisher')
 
   args = parser.parse_args()
   config = {}
@@ -125,4 +125,4 @@ if __name__ == '__main__':
     exit(-1)
   main(config,
        True if args.persistence else False,
-       True if args.fakepublisher else False)
+       True if args.dummy else False)

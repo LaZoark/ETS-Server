@@ -1,2 +1,2 @@
-from .MqttFakePublisher import MQTTFakePublisher
+from .MqttFakePublisher import MQTTDummyPublisher
 from .MqttListener import MQTTListener

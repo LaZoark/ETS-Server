@@ -4,7 +4,7 @@ import pandas as pd
 from copy import deepcopy
 
 
-class MQTTFakePublisher:
+class MQTTDummyPublisher:
     def __init__(self, config):
         self.config = config
 
@@ -47,7 +47,7 @@ class MQTTFakePublisher:
             string = string + " " + str(s)
         return string[1:]
 
-    def fake_pubblish(self, file):
+    def dummy_pubblish(self, file):
         fd = pd.read_csv(file)
         fd = fd.sort_values(by=['timestamp'])
 
