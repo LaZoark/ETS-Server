@@ -4,6 +4,7 @@ from itertools import combinations
 from functools import reduce
 from statistics import mean
 from color_log import color
+from data_handling.TimeFrameAnalysis import TimeFrameAnalysis
 logging = color.setup(name=__name__, level=color.INFO)
 
 def getD(rssi, d0 = 1, n = 5.4,a = -41):
@@ -208,7 +209,7 @@ def getXY_new(room_id, rssi_measures, esp_ids, config):
     return final_result[0] / num_measures, final_result[1] / num_measures
 
 
-def analyze(time_frame_analysis, config):
+def analyze(time_frame_analysis: TimeFrameAnalysis, config):
     # values format
     # ESPID | MAC | SSID | TIMESTAMP | HASH | RSSI | SN | HTCI
 
@@ -229,8 +230,10 @@ def analyze(time_frame_analysis, config):
 
         rssi_measurements = device_fd['RSSI'].tolist()
         esp_ids = device_fd['ESPID'].tolist()
-        logging.debug(f'{esp_ids = }')
-        if len(rssi_measurements) == num_esp:
+        # logging.warning(f'{device_fd = }')
+        logging.warning(f'[{num_esp=}, {len(rssi_measurements)=}]({esp_ids}) ')
+        # if len(rssi_measurements) == num_esp:
+        if 1:                   # [BAD]: quick fix
             #x, y = getXY_new(room_id, rssi_measurements, esp_ids, config)
             x, y = getXY(room_id, rssi_measurements, esp_ids, config)
             mac = device_fd['MAC'].tolist()[0]
@@ -240,6 +243,7 @@ def analyze(time_frame_analysis, config):
             sn = device_fd['SN'].tolist()[0]
             htci = device_fd['HTCI'].tolist()[0]
 
+            logging.warning(f'[OK] {x=}, {y=}')
             if x > 0. and y > 0.:
                 entry = (hash, mac, tid, room_id, x, y, sn, htci)
                 entries.append(entry)
