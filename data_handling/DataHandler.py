@@ -24,8 +24,11 @@ class DataHandler:
 
         roomId, espId = topic.split("/")[1:3]
         if espId not in self.config["room"]["1"]["EspCoor"]:
-            logging.error(f'[{espId = }], but expect: {self.config["room"]["1"]["EspCoor"]}')
-            raise NameError(f'{espId = }')
+            if espId == 'lib_esp32_\x0e':
+                espId = 'lib_esp32_3'   # [BUG] Seem like it is cause by "lib_esp32_3"
+            else:
+                logging.error(f'[{espId = }], but expect: {self.config["room"]["1"]["EspCoor"]}')
+                raise NameError(f'{espId = }')
         # topic ETS\%room\%esp:
         if roomId not in self.rooms:
             self.rooms[roomId] = RoomAnalysis(roomId, self.queue, self.cv, self.config)
