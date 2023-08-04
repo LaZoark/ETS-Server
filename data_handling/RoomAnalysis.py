@@ -35,7 +35,7 @@ class RoomAnalysis:
             if self.currentAnalysisData.putRows(espId, header, rows):
                 logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
                 self.putDataQueue()
-                logging.warning(f'{self.currentAnalysisData.getDataFrame() = }')
+                logging.debug(f'{self.currentAnalysisData.getDataFrame() = }')
                 self.currTid += self.config['Sniffing_time']
                 with self.lock:
                     self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
@@ -52,9 +52,9 @@ class RoomAnalysis:
     def putDataQueue(self):
         with self.cv:
             self.cv.wait(timeout=4)
-            logging.warning(f'{self.queue.qsize() = }')
+            # logging.warning(f'{self.queue.qsize() = }')
             with self.lock:
-                print('*%'*60)
+                # print('*%'*60)
                 self.queue.put(deepcopy(self.currentAnalysisData))
             logging.warning(f'{self.queue.qsize() = }')
             self.cv.notify_all()
