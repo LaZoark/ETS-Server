@@ -8,7 +8,6 @@ class DbHandler:
         self.config = config
         self.persistence = persistence
         logging.setLevel(log_level)
-        self.db_watchdog_rollback = 3
 
     def __enter__(self):
         logging.debug("[DB] Connecting to database...")
@@ -71,17 +70,14 @@ class DbHandler:
         sql_formula = "INSERT INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         try:
             mycursor.execute("USE pds")
-            logging.debug(f"Trying to insert this: {value}")
+            # logging.debug(f"Trying to insert this: {value}")
+            logging.debug(f"Trying to insert this: {len(value)=}")
             mycursor.executemany(sql_formula, value)
             self.mydb.commit()
-            if self.db_watchdog_rollback < 0:
-                self.db_watchdog_rollback = 3
         except Exception as e:
-            self.db_watchdog_rollback -= 1
             logging.error('Something went wrong', exc_info=e)
-            if self.db_watchdog_rollback >= 0:
-                self.mydb.rollback()
-                raise e
+            self.mydb.rollback()
+            # raise e
         mycursor.close()
 
     def __exit__(self, exc_type, exc_val, exc_tb):

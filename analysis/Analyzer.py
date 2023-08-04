@@ -16,6 +16,7 @@ class Analyzer:
         self.thread = Thread(target=self.run, args=(self.queue,))
         self.log_level_sub = log_level
         logging.setLevel(log_level)
+        self.db_watchdog_rollback = 2
 
     def start(self):
         if not self.db_persistence:
@@ -64,10 +65,12 @@ class Analyzer:
                         logging.info("Data inserted to the database with success! Cleaning buffer...")
                         entries = []
                 except Exception as e:
-                    logging.error("Unable to send entries, retrying the next time", exc_info=e)
-            # else:
-            #     logging.debug(f'[{len(entries) = }], Nope.')
-            #     # logging.debug("YES, there is something to send to the database")
+                    self.db_watchdog_rollback -= 1
+                    logging.error(f"Unable to send entries, retrying the next time (trial: {self.db_watchdog_rollback})", exc_info=e)
+                    if self.db_watchdog_rollback == 0:
+                        logging.fatal(f'Impossible to send entries! Abort these entries. (with {self.db_watchdog_rollback} retry)')
+                        entries = []
+                        
 
     def stop(self):
         logging.info("Stopping Analyzer!")
