@@ -1,12 +1,12 @@
 import paho.mqtt.client as mqtt
 from color_log import color
 logging = color.setup(name=__name__, level=color.DEBUG)
-
+from queue import Queue as _Queue
 from data_handling.DataHandler import DataHandler
 
 
 class MQTTListener():
-    def __init__(self, queue, cv, config, log_level: int=color.DEBUG):
+    def __init__(self, queue: _Queue, cv, config, log_level: int=color.DEBUG):
         self.config = config
         logging.info("Creating MQTT Obj")
 

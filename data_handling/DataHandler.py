@@ -2,9 +2,10 @@ from data_handling.RoomAnalysis import RoomAnalysis
 from threading import Lock
 from color_log import color
 logging = color.setup(name=__name__, level=color.DEBUG)
+from queue import Queue as _Queue
 
 class DataHandler:
-    def __init__(self, queue, cv, config):
+    def __init__(self, queue: _Queue, cv, config):
         # configurations
         self.queue = queue
         self.cv = cv
@@ -18,8 +19,7 @@ class DataHandler:
     
     def put(self, topic, payload):
         #DEBUG
-        logging.info("MQTT Data Received...")
-        logging.info(f'MQTT Topic: ["{topic}"]')
+        logging.info(f'Receiving data from MQTT Topic: ["{topic}"]')
         logging.info(f'Data: {payload}')
 
         roomId, espId = topic.split("/")[1:3]
