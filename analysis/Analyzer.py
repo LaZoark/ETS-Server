@@ -35,13 +35,13 @@ class Analyzer:
         t = current_thread()
         entries = []
         while getattr(t, "do_run", True):
-            logging.verbose("Analyzer running")
+            # logging.verbose("Analyzer running")
             with self.cv:
-                logging.verbose("Analyzer go to sleep")
+                # logging.verbose("Analyzer go to sleep")
                 self.cv.wait_for(
                     lambda: not queue.empty() or not getattr(t, "do_run", True), 
                     timeout=5)
-            logging.verbose("Analyzer woke up")
+            # logging.verbose("Analyzer woke up")
             logging.debug(f'{self.queue.qsize() = }')
             while not queue.empty():
                 try:
