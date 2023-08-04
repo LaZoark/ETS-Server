@@ -23,7 +23,8 @@ COLORS = {
     'DEBUG': BLUE,
     # 'CRITICAL': YELLOW,
     'CRITICAL': CYAN,
-    'ERROR': RED
+    'ERROR': RED,
+    'VERBOSE': MAGENTA,
 }
 
 class ColoredFormatter(logging.Formatter):
@@ -38,6 +39,16 @@ class ColoredFormatter(logging.Formatter):
             record.levelname = levelname_color
         return logging.Formatter.format(self, record)
 
+### for convenience calling
+CRITICAL = 50
+FATAL = CRITICAL
+ERROR = 40
+WARNING = 30
+WARN = WARNING
+INFO = 20
+DEBUG = 10
+VERBOSE = DEBUG+1
+NOTSET = 0
 
 
 # Custom logger class with multiple destinations
@@ -56,6 +67,13 @@ class ColoredLogger(logging.Logger):
 
         self.addHandler(console)
         return
+    # Custom log level
+    logging.addLevelName(VERBOSE, "VERBOSE")
+    def verbose(self, message, *args, **kws):
+        if self.isEnabledFor(VERBOSE):
+            # Yes, logger takes its '*args' as 'args'.
+            self._log(VERBOSE, message, args, **kws) 
+    logging.Logger.verbose = verbose
 
 
 def setup(
@@ -70,19 +88,6 @@ def setup(
   _color_logger.setLevel(level)
   return _color_logger
 
-# class TTTT:
-#     def __init__(self) -> None:
-#         pass
-
-### for convenience calling
-CRITICAL = 50
-FATAL = CRITICAL
-ERROR = 40
-WARNING = 30
-WARN = WARNING
-INFO = 20
-DEBUG = 10
-NOTSET = 0
 
 
 if __name__ == "__main__":
@@ -96,12 +101,14 @@ if __name__ == "__main__":
   color_log.warning("test")
   color_log.error("test")
   color_log.critical("test")
+#   color_log.verbose(VERBOSE, "test")
   
   print(f'test quick setup: ')
   
   color_logger = setup()
-  color_logger.debug("vleronovekrnerv")
-  color_logger.info("vleronovekrnerv")
-  color_logger.warning("vleronovekrnerv")
-  color_logger.error("vleronovekrnerv")
-  color_logger.critical("vleronovekrnerv")
+  color_logger.debug('Demo log ==> "debug"')
+  color_logger.info('Demo log ==> "info"')
+  color_logger.warning('Demo log ==> "warning"')
+  color_logger.error('Demo log ==> "error"')
+  color_logger.critical('Demo log ==> "critical"')
+  color_logger.verbose('Demo log ==> "verbose"')
