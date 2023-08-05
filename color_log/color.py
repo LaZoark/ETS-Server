@@ -88,7 +88,36 @@ def setup(
   _color_logger.setLevel(level)
   return _color_logger
 
+def print_format_table():
+    """
+    prints table of formatted text format options
+    """
+    for style in range(8):
+        for fg in range(30, 38):
+            s1 = ''
+            for bg in range(40, 48):
+                format = ';'.join([str(style), str(fg), str(bg)])
+                s1 += '\x1b[%sm %s \x1b[0m' % (format, format)
+            print(s1)
+        print('\n')
 
+# https://www.geeksforgeeks.org/print-colors-python-terminal/
+def bg_black(skk): 
+    return "\033[40m{}\033[00m" .format(skk)
+def bg_red(skk): 
+    return "\033[41m{}\033[00m" .format(skk)
+def bg_green(skk): 
+    return "\033[42m{}\033[00m" .format(skk)
+def bg_yellow(skk): 
+    return "\033[43m{}\033[00m" .format(skk)
+def bg_blue(skk): 
+    return "\033[44m{}\033[00m" .format(skk)
+def bg_purple(skk): 
+    return "\033[45m{}\033[00m" .format(skk)
+def bg_cyan(skk): 
+    return "\033[46m{}\033[00m" .format(skk)
+def bg_lightgrey(skk): 
+    return "\033[47m{}\033[00m" .format(skk)
 
 if __name__ == "__main__":
   
@@ -96,15 +125,15 @@ if __name__ == "__main__":
   color_log = logging.getLogger("Sniffer")
   color_log.setLevel(logging.DEBUG)
 
-  color_log.debug("test")
-  color_log.info("test")
-  color_log.warning("test")
-  color_log.error("test")
-  color_log.critical("test")
-#   color_log.verbose(VERBOSE, "test")
+#   color_log.debug("test")
+#   color_log.info("test")
+#   color_log.warning("test")
+#   color_log.error("test")
+#   color_log.critical("test")
   
-  print(f'test quick setup: ')
-  
+#   print_format_table()
+  print(bg_yellow('test quick setup: '))
+
   color_logger = setup()
   color_logger.debug('Demo log ==> "debug"')
   color_logger.info('Demo log ==> "info"')
