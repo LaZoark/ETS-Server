@@ -56,5 +56,5 @@ class RoomAnalysis:
             with self.lock:
                 # print('*%'*60)
                 self.queue.put(deepcopy(self.currentAnalysisData))
-            logging.warning(f'{self.queue.qsize() = }')
+            logging.debug(color.bg_lightgrey(f'{self.queue.qsize() = }'))
             self.cv.notify_all()

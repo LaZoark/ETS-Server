@@ -19,7 +19,7 @@ class DataHandler:
     
     def put(self, topic, payload):
         #DEBUG
-        logging.info(f'Receiving data from MQTT Topic: ["{topic}"]')
+        logging.info(f'Receiving data from MQTT Topic: ["{color.bg_green(topic)}"]')
         logging.info(f'Data: {payload}')
 
         roomId, espId = topic.split("/")[1:3]

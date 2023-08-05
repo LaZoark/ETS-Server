@@ -45,7 +45,8 @@ class TimeFrameAnalysis:
         if isLast(header):
             logging.info(f"Last packet sent from [{espId=}]. (Timestamp={header.split(' ')[1]})")
             self.nCompleted = self.nCompleted + 1
-            logging.info(f"Actual number of bunch of data: {self.nCompleted}, Waiting: {self.numEsp}")
+            # logging.info(f"Actual number of bunch of data: {self.nCompleted}, Waiting: {self.numEsp}")
+            logging.info(color.bg_yellow(f"Actual number of bunch of data: {self.nCompleted}, Waiting: {self.numEsp}"))
             if self.nCompleted == self.numEsp:
                 return True
         return False
