@@ -90,7 +90,10 @@ def getXY(room_id, rssi_measures, esp_ids, config):
                 N = N + 1
                 Xp += xp
                 Yp += yp
-        x, y = (Xp / N), (Yp / N)
+        try:
+            x, y = (Xp / N), (Yp / N)
+        except Exception as e:
+            logging.error(e)
 
     if x >= 0. and x <= x_room and y >=0. and y <= y_room:
         return x, y
