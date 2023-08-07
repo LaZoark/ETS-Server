@@ -67,17 +67,18 @@ class DbHandler:
 
     def insert (self, value):
         mycursor = self.mydb.cursor()
-        sql_formula = "INSERT INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        # sql_formula = "INSERT INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        # https://stackoverflow.com/questions/27787472/how-to-avoid-duplicate-entries-in-a-mysql-database-without-throwing-an-error
+        sql_formula = "INSERT IGNORE INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         try:
             mycursor.execute("USE pds")
-            # logging.debug(f"Trying to insert this: {value}")
             logging.debug(f"Trying to insert this: {len(value)=}")
             mycursor.executemany(sql_formula, value)
             self.mydb.commit()
         except Exception as e:
             logging.error('Something went wrong', exc_info=e)
             self.mydb.rollback()
-            # raise e
+            # logging.error(color.bg_blue('Try not doing "self.mydb.rollback()"'))
         mycursor.close()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
