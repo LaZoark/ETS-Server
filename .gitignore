@@ -4,4 +4,3 @@
 mariadb_docker.sh
 configurations.yaml
 .vscode/settings.json
-wise_paas/agent.py
