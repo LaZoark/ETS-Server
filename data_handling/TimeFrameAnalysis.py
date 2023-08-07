@@ -18,14 +18,22 @@ class TimeFrameAnalysis:
         # Data
         self.entries = list()
 
-    def putRows(self, espId, header, rows):
+    def putRows(self, espId, header, rows, bypass: bool=False):
+        '''
+        Check if the received package from esp32 is equals to expected value.
+        * If `bypass` is `True`, it will return `True` without meeting the condition.
+        
+        The entry is split into a list composed by measures and values
+        
+        `ESPID(added there) | MAC | SSID | TIMESTAMP | HASH | RSSI | SN | HTCI`
+        
+        The SSID can contain space, so the lenght of the entry should be checked, and if it
+        exceed the normal lenght, the ssid should be riconstructed and be put in one element
+        of the vector entry_reformed
+        '''
+        _return: bool = False
         for row in rows:
-            # The entry is split into a list composed by measures and values
-            # ESPID(added there) | MAC | SSID | TIMESTAMP | HASH | RSSI | SN | HTCI
             entry = row.split(" ")
-            # The SSID can contain space, so the lenght of the entry should be checked, and if it
-            # exceed the normal lenght, the ssid should be riconstructed and be put in one element
-            # of the vector entry_reformed
             len_ent = len(entry)
             if len_ent >= 8:
                 entry_reformed = list()
@@ -45,11 +53,10 @@ class TimeFrameAnalysis:
         if isLast(header):
             logging.info(f"Last packet sent from [{espId=}]. (Timestamp={header.split(' ')[1]})")
             self.nCompleted = self.nCompleted + 1
-            # logging.info(f"Actual number of bunch of data: {self.nCompleted}, Waiting: {self.numEsp}")
             logging.info(color.bg_yellow(f"Actual number of bunch of data: {self.nCompleted}, Waiting: {self.numEsp}"))
             if self.nCompleted == self.numEsp:
-                return True
-        return False
+                _return = True
+        return True if bypass else _return
 
     def getDataFrame(self):
         return pd.DataFrame(self.entries, columns=['ESPID','MAC','SSID','TIMESTAMP','HASH','RSSI','SN','HTCI'])
