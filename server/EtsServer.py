@@ -8,7 +8,7 @@ from mqtt import MQTTDummyPublisher
 from mqtt import MQTTListener
 
 
-def run_mqtt(mqttclient):
+def run_mqtt(mqttclient: MQTTListener):
     mqttclient.start()
     #mqttclient.loop()
 
