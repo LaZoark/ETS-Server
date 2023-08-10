@@ -57,18 +57,20 @@ class Analyzer:
             if len(entries) > 0:
                 # logging.debug("YES, there is something to send to the database")
                 try:
-                    # logging.debug(f"{self.db_persistence=}")
                     with DbHandler(self.config, persistence=self.db_persistence,
                                    log_level=self.log_level_sub) as dh:
                         logging.debug("Connection is ok")
                         dh.insert(entries)
-                        logging.info(color.bg_lightgrey("Data inserted to the database with success! Cleaning buffer..."))
+                        logging.info("Data inserted to the database with success! Cleaning buffer...")
                         entries = []
                 except Exception as e:
                     self.db_watchdog_rollback -= 1
-                    logging.error(f"Unable to send entries, retrying the next time (trial: {self.db_watchdog_rollback})", exc_info=e)
+                    logging.error(f"Unable to send entries, "
+                                  f"retrying the next time (trial: {self.db_watchdog_rollback})",
+                                  exc_info=e)
                     if self.db_watchdog_rollback == 0:
-                        logging.fatal(f'Impossible to send entries! Abort these entries. (with {self.db_watchdog_rollback} retries)')
+                        logging.fatal(f'Impossible to send entries! '
+                                      f'Abort these entries. (with {self.db_watchdog_rollback} retries)')
                         entries = []
                         
 

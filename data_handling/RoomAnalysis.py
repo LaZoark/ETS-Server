@@ -5,7 +5,7 @@ logging = color.setup(name=__name__, level=color.DEBUG)
 from data_handling.TimeFrameAnalysis import TimeFrameAnalysis
 from utility.utility import getTid
 from queue import Queue as _Queue
-
+import datetime 
 
 class RoomAnalysis:
     def __init__(self, id, queue: _Queue, cv, config):
@@ -33,15 +33,27 @@ class RoomAnalysis:
         _bypass = False
         # DEBUG
         # print("Trying to take the lock for the room: ",self.roomId)
-        logging.debug(color.bg_purple(f'Last push:  {self.tracing.last_upload_tid}'))
+        logging.debug(color.bg_purple(f'Last push:  {self.tracing.last_upload_tid} ') + \
+                      f' ({datetime.datetime.fromtimestamp(self.tracing.last_upload_tid)})'
+                      )
         if abs(self.tracing.now() - self.tracing.last_upload_tid) >= 60*2:    # Force push every 2 minutes!
             logging.debug(color.bg_purple(
                 f'Unable to receive all packet for {self.tracing.now() - self.tracing.last_upload_tid} seconds. ') + \
                         color.bg_red('Force pushing to the queue!'))
             _bypass = True
+            self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
 
         if espTid < self.currTid:
-            logging.warning("Old packet, all the packets captured that are written into it will not be be analyzed")
+            logging.warning(f"Old packet, all the packets captured that are written into it will not be analyzed [{espTid=}, currTid={self.currTid}]")
+            logging.warning(f"Push it anyway")
+            if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
+                logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
+                self.putDataQueue()
+                logging.debug(f'{self.currentAnalysisData.getDataFrame() = }')
+                self.currTid += self.config['Sniffing_time']
+                self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
+                with self.lock:
+                    self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
         elif espTid == self.currTid:
             logging.debug(f"for [{espTid=}]: packets were sent, check if it is the last one")
             if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
@@ -71,9 +83,6 @@ class RoomAnalysis:
     def putDataQueue(self):
         with self.cv:
             self.cv.wait(timeout=4)
-            # logging.warning(f'{self.queue.qsize() = }')
             with self.lock:
-                # print('*%'*60)
                 self.queue.put(deepcopy(self.currentAnalysisData))
-            logging.debug(f'{self.queue.qsize() = }')
             self.cv.notify_all()

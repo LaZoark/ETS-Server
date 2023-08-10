@@ -11,7 +11,7 @@ from wisepaasdatahubedgesdk.Model.Edge import (EdgeAgentOptions, MQTTOptions,
                                                AnalogTagConfig, DiscreteTagConfig, TextTagConfig
                                                )
 from color_log import color
-logging = color.setup(name=__name__, level=color.DEBUG)
+logging = color.setup(name=__name__, level=color.INFO)
 
 '''
 # Event
@@ -48,7 +48,7 @@ def edgeAgent_on_message(agent, messageReceivedEventArgs):
     if not message.result:
       logging.warning(f'Upload Config Result: {message.result}')
     else:
-      logging.info(f'Upload Config Result: {message.result}')
+      logging.debug(f'Upload Config Result: {message.result}')
 
 
 def prepare_data(
