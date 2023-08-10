@@ -1,5 +1,5 @@
 import mysql.connector
-# from mysql.connector import errorcode
+from mysql.connector import errorcode
 from color_log import color
 logging = color.setup(name=__name__, level=color.DEBUG)
 
@@ -66,19 +66,29 @@ class DbHandler:
 
 
     def insert (self, value):
-        mycursor = self.mydb.cursor()
-        # sql_formula = "INSERT INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         # https://stackoverflow.com/questions/27787472/how-to-avoid-duplicate-entries-in-a-mysql-database-without-throwing-an-error
-        sql_formula = "INSERT IGNORE INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        # sql_formula = "INSERT IGNORE INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        n_data = len(value)
+        mycursor = self.mydb.cursor()
+        sql_formula = "INSERT INTO devices (HASH, MAC, TID, ROOMID, X, Y, SN, HTCI) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        mycursor.execute("USE pds")
+        logging.debug(f"Trying to insert this: {n_data=}")
+        for _id, _value in enumerate(value, 1):
+            try:
+                # mycursor.executemany(sql_formula, value)
+                mycursor.execute(sql_formula, _value)
+            except mysql.connector.Error as e:
+                if e.errno == errorcode.ER_DUP_ENTRY:
+                    logging.error(f'[{_id}/{len(value)}] Ignoring duplicated entry. [{errorcode.ER_DUP_ENTRY}]')
+                    n_data -= 1
+                else:
+                    logging.error('Something went wrong!', exc_info=e)
         try:
-            mycursor.execute("USE pds")
-            logging.debug(f"Trying to insert this: {len(value)=}")
-            mycursor.executemany(sql_formula, value)
             self.mydb.commit()
+            logging.debug(color.bg_lightgrey(f"Actually inserted data: [{n_data}/{len(value)}]"))
         except Exception as e:
-            logging.error('Something went wrong', exc_info=e)
-            self.mydb.rollback()
-            # logging.error(color.bg_blue('Try not doing "self.mydb.rollback()"'))
+            logging.error('Fail to commit!', exc_info=e)
+            self.mydb.rollback()  # rollback is for unwanted commit
         mycursor.close()
 
     def __exit__(self, exc_type, exc_val, exc_tb):

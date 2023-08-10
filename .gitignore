@@ -4,3 +4,5 @@
 mariadb_docker.sh
 configurations.yaml
 .vscode/settings.json
+agent_test.py
+agent_test_tempNhumi.py
