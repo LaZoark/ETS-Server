@@ -49,15 +49,15 @@ class RoomAnalysis:
 
         if espTid < self.currTid:
             logging.warning(f"Old packet, won't be analyzed [{espTid=}, relative: {color.tt_red(self.currTid-espTid)}]")
-            # logging.warning(f"Push it anyway")        # Will cause the negativer relative timestamp
-            # if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
-            #     logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
-            #     self.putDataQueue()
-            #     logging.debug(f'Current Data:\n{self.currentAnalysisData.getDataFrame()}')
-            #     self.currTid += self.config['Sniffing_time']
-            #     self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
-            #     with self.lock:
-            #         self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
+            logging.warning(f"Trying to push it anyway")
+            if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
+                logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
+                self.putDataQueue()
+                logging.debug(f'Current Data:\n{self.currentAnalysisData.getDataFrame()}')
+                # self.currTid += self.config['Sniffing_time']    # Will cause the negativer relative timestamp
+                # self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
+                with self.lock:
+                    self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
         elif espTid == self.currTid:
             logging.debug(f"for [{espTid=}]: packets were sent, check if it is the last one")
             if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
