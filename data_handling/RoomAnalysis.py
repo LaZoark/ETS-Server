@@ -48,7 +48,7 @@ class RoomAnalysis:
             self.received_esp32_list = []
 
         if espTid < self.currTid:
-            logging.warning(f"Old packet, won't be analyzed [{espTid=}, relative: {self.currTid-espTid}]")
+            logging.warning(f"Old packet, won't be analyzed [{espTid=}, relative: {color.tt_red(self.currTid-espTid)}]")
             # logging.warning(f"Push it anyway")        # Will cause the negativer relative timestamp
             # if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
             #     logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")

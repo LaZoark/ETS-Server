@@ -102,22 +102,43 @@ def print_format_table():
         print('\n')
 
 # https://www.geeksforgeeks.org/print-colors-python-terminal/
-def bg_black(skk): 
+def bg_black(skk):
     return "\033[40m{}\033[00m" .format(skk)
-def bg_red(skk): 
+def bg_red(skk):
     return "\033[41m{}\033[00m" .format(skk)
-def bg_green(skk): 
+def bg_green(skk):
     return "\033[42m{}\033[00m" .format(skk)
-def bg_yellow(skk): 
+def bg_yellow(skk):
     return "\033[43m{}\033[00m" .format(skk)
-def bg_blue(skk): 
+def bg_blue(skk):
     return "\033[44m{}\033[00m" .format(skk)
-def bg_purple(skk): 
+def bg_purple(skk):
     return "\033[45m{}\033[00m" .format(skk)
-def bg_cyan(skk): 
+def bg_cyan(skk):
     return "\033[46m{}\033[00m" .format(skk)
-def bg_lightgrey(skk): 
+def bg_lightgrey(skk):
     return "\033[47m{}\033[00m" .format(skk)
+
+def tt_red(skk):
+    return "\033[91m{}\033[00m" .format(skk)
+def tt_green(skk):
+    return "\033[92m{}\033[00m" .format(skk)
+def tt_yellow(skk):
+    return "\033[93m{}\033[00m" .format(skk)
+def tt_lightpurple(skk):
+    return "\033[94m{}\033[00m" .format(skk)
+def tt_purple(skk):
+    return "\033[95m{}\033[00m" .format(skk)
+def tt_cyan(skk):
+    return "\033[96m{}\033[00m" .format(skk)
+def tt_lightgray(skk):
+    return "\033[97m{}\033[00m" .format(skk)
+def tt_black(skk):
+    return "\033[98m{}\033[00m" .format(skk)
+
+
+
+
 
 if __name__ == "__main__":
   
@@ -141,3 +162,20 @@ if __name__ == "__main__":
   color_logger.error('Demo log ==> "error"')
   color_logger.critical('Demo log ==> "critical"')
   color_logger.verbose('Demo log ==> "verbose"')
+  
+  print(bg_black('bg_black'))
+  print(bg_red('bg_red'))
+  print(bg_green('bg_green'))
+  print(bg_yellow('bg_yellow'))
+  print(bg_blue('bg_blue'))
+  print(bg_purple('bg_purple'))
+  print(bg_cyan('bg_cyan'))
+  print(bg_lightgrey('bg_lightgrey'))
+  print(tt_red('tt_red'))
+  print(tt_green('tt_green'))
+  print(tt_yellow('tt_yellow'))
+  print(tt_lightpurple('tt_lightpurple'))
+  print(tt_purple('tt_purple'))
+  print(tt_cyan('tt_cyan'))
+  print(tt_lightgray('tt_lightgray'))
+  print(tt_black('tt_black'))
