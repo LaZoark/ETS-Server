@@ -6,7 +6,7 @@ from data_handling.DataHandler import DataHandler
 
 from wise_paas import ESP32
 from utility.utility import unique
-
+from time import time
 class MQTTListener():
     def __init__(self, queue: _Queue, cv, config, log_level: int=color.DEBUG):
         self.config = config
@@ -16,8 +16,8 @@ class MQTTListener():
         self.dataHandler = DataHandler(queue, cv, config)
 
         self.monitor = ESP32(yaml_config=config)  # Building connection
-        self.working_devices = config["room"]['1']["numEsp"]
-        self._working_devices = self.working_devices
+        self.monitor_timer = int(time())
+        
 
         # mqtt client is configured
         self.mqttc = mqtt.Client(client_id=self.config['MQTT_username_listener'],
@@ -42,11 +42,10 @@ class MQTTListener():
 
             self.monitor.online_list.append(msg.topic.split('/')[-1])
             logging.info(f'{color.bg_green("[Monitor]")} ({unique(self.monitor.online_list)}) {msg.topic=}')
-            self.working_devices -= 1
-            if self.working_devices == 0:
+            if time() - self.monitor_timer > 20:    # monitor every 20 seconds
                 self.monitor.check_alive(unique(self.monitor.online_list))
                 self.monitor.online_list = []     # recovery
-                self.working_devices = self._working_devices  # recovery
+                self.monitor_timer = time()       # recovery
 
         except Exception as e:
             logging.fatal(f'Skipping! Unable to handle: [{msg.topic = }] {e}')
