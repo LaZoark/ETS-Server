@@ -3,9 +3,9 @@ from threading import Lock
 from color_log import color, tracing_log
 logging = color.setup(name=__name__, level=color.DEBUG)
 from data_handling.TimeFrameAnalysis import TimeFrameAnalysis
-from utility.utility import getTid
+from utility.utility import getTid, unique
 from queue import Queue as _Queue
-import datetime 
+import datetime
 
 class RoomAnalysis:
     def __init__(self, id, queue: _Queue, cv, config):
@@ -18,8 +18,8 @@ class RoomAnalysis:
         self.roomId = id
         self.currTid = -1
         self.numEsp = config["room"][self.roomId]["numEsp"]
+        self.received_esp32_list = []
         self.currentAnalysisData = TimeFrameAnalysis(-1, 1, id)
-        # tracing_log.Tracing.last_upload_tid = self.currTid
         self.tracing = tracing_log.Tracing()
         logging.debug(color.bg_purple(f'Start tracing! Current TID={self.tracing.now()}'))
         self.tracing.last_upload_tid = self.tracing.now()
@@ -29,37 +29,41 @@ class RoomAnalysis:
     
     def putData(self, espId, header, rows):
         '''This function will calibration the TID(Time ID) whenever the data received'''
+        self.received_esp32_list.append(espId)
         espTid = getTid(header)
         _bypass = False
-        # DEBUG
-        # print("Trying to take the lock for the room: ",self.roomId)
         logging.debug(color.bg_purple(f'Last push:  {self.tracing.last_upload_tid} ') + \
-                      f' ({datetime.datetime.fromtimestamp(self.tracing.last_upload_tid)})'
-                      )
-        if abs(self.tracing.now() - self.tracing.last_upload_tid) >= 60*2:    # Force push every 2 minutes!
+                      f' ({datetime.datetime.fromtimestamp(self.tracing.last_upload_tid)})')
+        quiet_period = self.tracing.now() - self.tracing.last_upload_tid
+        if abs(quiet_period) >= 60*2:    # Force push every 2 minutes!
             logging.debug(color.bg_purple(
-                f'Unable to receive all packet for {self.tracing.now() - self.tracing.last_upload_tid} seconds. ') + \
+                f'Unable to receive all packet for {quiet_period} seconds. ') + \
                         color.bg_red('Force pushing to the queue!'))
             _bypass = True
-            self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
+            # self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
+
+            logging.warning('Taking too long waiting for all ESP32. Dropping them...'+\
+                color.bg_cyan(f"Received ESP32: {unique(self.received_esp32_list)}. (total: {self.numEsp}->{len(unique(self.received_esp32_list))})"))
+            self.numEsp = len(unique(self.received_esp32_list))
+            self.received_esp32_list = []
 
         if espTid < self.currTid:
-            logging.warning(f"Old packet, all the packets captured that are written into it will not be analyzed [{espTid=}, currTid={self.currTid}]")
-            logging.warning(f"Push it anyway")
-            if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
-                logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
-                self.putDataQueue()
-                logging.debug(f'{self.currentAnalysisData.getDataFrame() = }')
-                self.currTid += self.config['Sniffing_time']
-                self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
-                with self.lock:
-                    self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
+            logging.warning(f"Old packet, won't be analyzed [{espTid=}, relative: {self.currTid-espTid}]")
+            # logging.warning(f"Push it anyway")        # Will cause the negativer relative timestamp
+            # if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
+            #     logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
+            #     self.putDataQueue()
+            #     logging.debug(f'Current Data:\n{self.currentAnalysisData.getDataFrame()}')
+            #     self.currTid += self.config['Sniffing_time']
+            #     self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
+            #     with self.lock:
+            #         self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
         elif espTid == self.currTid:
             logging.debug(f"for [{espTid=}]: packets were sent, check if it is the last one")
             if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
                 logging.info(f"for [{espTid=}]: all the packets were sent, putting it into the queue")
                 self.putDataQueue()
-                logging.debug(f'{self.currentAnalysisData.getDataFrame() = }')
+                logging.debug(f'Current Data:\n{self.currentAnalysisData.getDataFrame()}')
                 self.currTid += self.config['Sniffing_time']
                 self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
                 with self.lock:
@@ -71,11 +75,6 @@ class RoomAnalysis:
             # TODO analyze data with what i have?
             with self.lock:
                 self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
-            # if abs(self.tracing.now() - self.tracing.last_upload_tid) >= 60*2:    # Force push every 2 minutes!
-            #     logging.debug(color.bg_purple(
-            #         f'Unable to receive all packet for {self.tracing.now() - self.tracing.last_upload_tid} seconds. ') + \
-            #                 color.bg_red('Force pushing to the queue!'))
-            #     _bypass = True
             if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
                 self.putDataQueue()
                 self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)

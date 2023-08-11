@@ -1,9 +1,8 @@
 import pandas as pd
 from color_log import color
 logging = color.setup(name=__name__, level=color.INFO)
-
+import datetime
 from utility.utility import isLast
-from wise_paas import monitor
 
 # esp32_monitor = monitor.ESP32()  # monitor the status of all ESP32
 class TimeFrameAnalysis:
@@ -18,8 +17,6 @@ class TimeFrameAnalysis:
         self.nCompleted = 0
         # Data
         self.entries = list()
-        # self.monitor = esp32_monitor
-        # self.monitor = monitor.ESP32()  # monitor the status of all ESP32
 
     def putRows(self, espId, header, rows, bypass: bool=False):
         '''
@@ -54,23 +51,12 @@ class TimeFrameAnalysis:
         # If it's the last of the minute timestamp, i increase the counter of completed frames
         # If all the packets of all ESP32 were sent, i put return True in order to put them into the queue
         if isLast(header):
-            logging.info(f"Last packet sent from [{espId=}]. (Timestamp={header.split(' ')[1]})")
+            logging.info(f"Last packet sent from [{espId=}]. (Timestamp={header.split(' ')[1]}, {datetime.datetime.fromtimestamp(int(header.split(' ')[1]))})")
             self.nCompleted = self.nCompleted + 1
-            logging.info(color.bg_yellow(f"Collecting data from ESP32: [{self.nCompleted}/{self.numEsp}] "))
+            logging.info(color.bg_yellow(f"Collecting data from ESP32: [{self.nCompleted}/{self.numEsp}]"))
             if self.nCompleted == self.numEsp:
                 _return = True
-            # self.check_alive(espId)
         return True if bypass else _return
 
     def getDataFrame(self):
         return pd.DataFrame(self.entries, columns=['ESPID','MAC','SSID','TIMESTAMP','HASH','RSSI','SN','HTCI'])
-
-    # def check_alive(self, espId: str):
-    #     _id = espId.split('_')[-1]
-    #     if len(_id) > 1:
-    #         _id = _id[0]
-    #     for check_id in ['1','2','3','4']:
-    #         if _id == check_id:
-    #             self.monitor.send_monitor(target=_id, value=True)
-    #         else:
-    #             self.monitor.send_monitor(target=_id, value=False)

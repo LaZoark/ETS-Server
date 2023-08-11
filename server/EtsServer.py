@@ -7,11 +7,15 @@ from analysis.Analyzer import Analyzer
 from mqtt import MQTTDummyPublisher
 from mqtt import MQTTListener
 
+# from wise_paas import monitor
+
+# def check_device_status(_listener: monitor.Listener):
+#     '''[Treading] monitor task'''
+#     _listener.start()
 
 def run_mqtt(mqttclient: MQTTListener):
     mqttclient.start()
     #mqttclient.loop()
-
 
 def run_mqtt_dummy(mqttclient: MQTTDummyPublisher):
     mqttclient.start()
@@ -30,12 +34,14 @@ class EtsServer:
         self._persist = db_persistence
 
         # classes
+        # self.monitor_mqtt = monitor.Listener(config, log_level=self.log_level)
         self.mqttl = MQTTListener(self.q, self.cv, config, log_level=self.log_level)
         self.analyzer = Analyzer(self.q, self.cv, config, db_persistence, log_level=self.log_level)
         if dummy:
             self.mqttfp = MQTTDummyPublisher(config)
 
         # threads
+        # self.monitor = Thread(target=check_device_status, args=(self.monitor_mqtt,))
         self.thread_mqttl = Thread(target=run_mqtt, args=(self.mqttl,))
         if dummy:
             self.thread_mqttfp = Thread(target=run_mqtt_dummy, args=(self.mqttfp,))
@@ -43,6 +49,7 @@ class EtsServer:
     def start(self):
         self.analyzer.start()
         self.thread_mqttl.start()
+        # self.monitor.start()
         if self.dummy:
             sleep(1)
             self.thread_mqttfp.start()
@@ -51,6 +58,7 @@ class EtsServer:
         # we declare to stop everything
         self.analyzer.stop()
         self.mqttl.stop()
+        # self.monitor_mqtt.stop()
         if self.dummy:
             self.mqttfp.stop()
 
@@ -58,6 +66,7 @@ class EtsServer:
         if self.dummy:
             self.thread_mqttfp.join()
         self.thread_mqttl.join()
+        # self.monitor.join()
     
     def debug_off(self):        
         if self.log_level == color.DEBUG:
