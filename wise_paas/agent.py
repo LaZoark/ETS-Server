@@ -233,6 +233,12 @@ def gen_data():
       )
   return edgeData
 
+def connect(edgeAgent: EdgeAgent):
+  logging.debug('Connecting to Agent...')
+  edgeAgent.connect()
+  while not edgeAgent.isConnected():
+    time.sleep(0.01)  # Waiting for connection to be established
+
 
 def setup(options: EdgeAgentOptions):
   edgeAgent = EdgeAgent(options=options)

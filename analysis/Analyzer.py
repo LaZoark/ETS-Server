@@ -3,6 +3,7 @@ from queue import Queue as _Queue
 from analysis.DBhandler import DbHandler
 from analysis.localization import analyze
 from color_log import color
+from datetime import datetime
 logging = color.setup(name=__name__, level=color.INFO)
 
 class Analyzer:
@@ -43,7 +44,6 @@ class Analyzer:
                     lambda: not queue.empty() or not getattr(t, "do_run", True), 
                     timeout=5)
             # logging.verbose("Analyzer woke up")
-            logging.debug(f'{self.queue.qsize() = }')
             while not queue.empty():
                 try:
                     time_frame_analysis = queue.get(timeout=2)
@@ -53,6 +53,10 @@ class Analyzer:
                 queue.task_done()
                 analyzed_entries = analyze(time_frame_analysis, self.config)
                 entries += analyzed_entries
+            else:
+                # logging.debug(f'{self.queue.qsize() = }')
+                # logging.debug(f'[{datetime.now()}] Queue is empty.')
+                logging.debug(f'[{datetime.now()}]')
             # logging.debug("is there something to send to the database?")
             if len(entries) > 0:
                 # logging.debug("YES, there is something to send to the database")
