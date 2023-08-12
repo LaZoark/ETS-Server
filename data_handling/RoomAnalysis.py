@@ -44,11 +44,13 @@ class RoomAnalysis:
             logging.warning('Taking too long waiting for all ESP32. Dropping them...' + color.bg_cyan(
                 f"(total: {self.numEsp}->{len(self.received_esp32_list)})"))
             self.numEsp = len(self.received_esp32_list)
+            self.currentAnalysisData.numEsp = self.numEsp      # This will update the final condition immediately
 
         if self.numEsp != len(self.received_esp32_list):
             logging.info(color.tt_lightpurple(
                 f"Dynamically adjust awaiting ESP32...(total: {self.numEsp}->{len(self.received_esp32_list)})"))
             self.numEsp = len(self.received_esp32_list)
+            self.currentAnalysisData.numEsp = self.numEsp      # This will update the final condition immediately
 
         if espTid < self.currTid:
             logging.warning(f"Old packet, won't be analyzed [{espTid=}, relative: {color.tt_red(self.currTid-espTid)}]")

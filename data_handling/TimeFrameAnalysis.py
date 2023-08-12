@@ -54,7 +54,7 @@ class TimeFrameAnalysis:
             logging.info(f"Last packet sent from [{espId=}]. (Timestamp={header.split(' ')[1]}, {datetime.datetime.fromtimestamp(int(header.split(' ')[1]))})")
             self.nCompleted = self.nCompleted + 1
             logging.info(color.bg_yellow(f"Collecting data from ESP32: [{self.nCompleted}/{self.numEsp}]"))
-            if self.nCompleted == self.numEsp:
+            if self.nCompleted >= self.numEsp:
                 _return = True
         return True if bypass else _return
 
