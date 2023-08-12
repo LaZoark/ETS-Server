@@ -79,7 +79,7 @@ class DbHandler:
                 mycursor.execute(sql_formula, _value)
             except mysql.connector.Error as e:
                 if e.errno == errorcode.ER_DUP_ENTRY:
-                    logging.error(f'[{_id}/{len(value)}] Ignoring duplicated entry. [{errorcode.ER_DUP_ENTRY}]')
+                    # logging.error(f'[{_id}/{len(value)}] Ignoring duplicated entry. [{errorcode.ER_DUP_ENTRY}]')
                     n_data -= 1
                 else:
                     logging.error('Something went wrong!', exc_info=e)

@@ -7,15 +7,16 @@ logging = color.setup(name=__name__, level=color.DEBUG)
 
 # from wise_paas import monitor
 
-# import datetime
+import datetime
 # print('ddd ' + str(datetime.datetime.fromtimestamp(1691500620)))
+dt = datetime.datetime.now()
+x = dt.strftime("[%Y-%m-%d %H:%M:%S]")
+print(x)
 
 # import numpy as np
-
 # aa = ['1', '3']
 # bb = ['1','2','3','4']
 # logging.info(list(set(bb)-set(aa)))
-
 
 # import yaml
 # filename = 'configurations.yaml' 
@@ -26,12 +27,11 @@ logging = color.setup(name=__name__, level=color.DEBUG)
 # print(config['WISE_PaaS']['DataHub']['ESP32_monitor']['nodeId'])
 # print(config['WISE_PaaS']['DataHub']['ESP32_monitor']['credentialKey'])
 
-from data_handling.RoomAnalysis import RoomAnalysis
-# rooms: {str: RoomAnalysis} = dict()
-rooms: typing.Dict[str, RoomAnalysis] = dict()
-print(rooms)
-# rooms = dict()
+# from data_handling.RoomAnalysis import RoomAnalysis
+# # rooms: {str: RoomAnalysis} = dict()
+# rooms: typing.Dict[str, RoomAnalysis] = dict()
 # print(rooms)
+
 
 # for i in range(10):
 #   if i == 7:

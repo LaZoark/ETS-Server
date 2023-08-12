@@ -55,8 +55,8 @@ class Analyzer:
                 entries += analyzed_entries
             else:
                 # logging.debug(f'{self.queue.qsize() = }')
-                # logging.debug(f'[{datetime.now()}] Queue is empty.')
-                logging.debug(f'[{datetime.now()}]')
+                _dt = datetime.now()
+                logging.debug(f'{_dt.strftime("[%Y-%m-%d %H:%M:%S]")} waiting {color.tt_green(60-_dt.second)}')
             # logging.debug("is there something to send to the database?")
             if len(entries) > 0:
                 # logging.debug("YES, there is something to send to the database")
