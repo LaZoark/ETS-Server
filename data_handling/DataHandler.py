@@ -29,7 +29,7 @@ class DataHandler:
 
         roomId, espId = topic.split("/")[1:3]
         if espId not in self.config["room"]["1"]["EspCoor"]:
-            if espId == r'lib_esp32_\x0e':
+            if espId == r'lib_esp32_\x0e' or espId == 'lib_esp32_\x0e':
                 espId = 'lib_esp32_3'   # [BUG] Seem like it is cause by "lib_esp32_3"
             else:
                 logging.error(f'[{espId = }], but expect: {self.config["room"]["1"]["EspCoor"]}')
