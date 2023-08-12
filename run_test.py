@@ -1,3 +1,4 @@
+import typing
 from color_log import color
 logging = color.setup(name=__name__, level=color.DEBUG)
 
@@ -16,14 +17,21 @@ logging = color.setup(name=__name__, level=color.DEBUG)
 # logging.info(list(set(bb)-set(aa)))
 
 
-import yaml
-filename = 'configurations.yaml' 
-with open(filename, 'r') as f:
-  config = yaml.load(f, yaml.FullLoader)
+# import yaml
+# filename = 'configurations.yaml' 
+# with open(filename, 'r') as f:
+#   config = yaml.load(f, yaml.FullLoader)
 
-print(config['WISE_PaaS']['DataHub']['apiUrl'])
-print(config['WISE_PaaS']['DataHub']['ESP32_monitor']['nodeId'])
-print(config['WISE_PaaS']['DataHub']['ESP32_monitor']['credentialKey'])
+# print(config['WISE_PaaS']['DataHub']['apiUrl'])
+# print(config['WISE_PaaS']['DataHub']['ESP32_monitor']['nodeId'])
+# print(config['WISE_PaaS']['DataHub']['ESP32_monitor']['credentialKey'])
+
+from data_handling.RoomAnalysis import RoomAnalysis
+# rooms: {str: RoomAnalysis} = dict()
+rooms: typing.Dict[str, RoomAnalysis] = dict()
+print(rooms)
+# rooms = dict()
+# print(rooms)
 
 # for i in range(10):
 #   if i == 7:

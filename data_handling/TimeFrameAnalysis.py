@@ -7,16 +7,16 @@ from utility.utility import isLast
 # esp32_monitor = monitor.ESP32()  # monitor the status of all ESP32
 class TimeFrameAnalysis:
     def __init__(self, tid, numEsp, roomid):
-        # the tid start of the time analysis
         self.tid = tid
-        # numbers of esp in the room
+        '''the Tid for the start of the time analysis'''
         self.numEsp = numEsp
-        # id of the room
+        '''numbers of the ESP32 in the room'''
         self.roomid = roomid
-        # numbers of esp that has completed their analysis
+        '''id of the room'''
         self.nCompleted = 0
-        # Data
+        '''numbers of the ESP32 that has their analysis completed'''
         self.entries = list()
+        '''Data'''
 
     def putRows(self, espId, header, rows, bypass: bool=False):
         '''

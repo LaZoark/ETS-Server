@@ -19,6 +19,7 @@ class RoomAnalysis:
         self.currTid = -1
         self.numEsp = config["room"][self.roomId]["numEsp"]
         self.received_esp32_list = []
+        '''ESP32 status came from `DataHandler.py` (already apply `unique()`)'''
         self.currentAnalysisData = TimeFrameAnalysis(-1, 1, id)
         self.tracing = tracing_log.Tracing()
         logging.debug(color.bg_purple(f'Start tracing! Current TID={self.tracing.now()}'))
@@ -29,10 +30,10 @@ class RoomAnalysis:
     
     def putData(self, espId, header, rows):
         '''This function will calibration the TID(Time ID) whenever the data received'''
-        self.received_esp32_list.append(espId)
+        # self.received_esp32_list.append(espId)
         espTid = getTid(header)
         _bypass = False
-        logging.debug(color.bg_purple(f'Last push:  {self.tracing.last_upload_tid} ') + \
+        logging.debug(color.bg_purple(f'Last push:  {self.tracing.last_upload_tid}') + \
                       f' ({datetime.datetime.fromtimestamp(self.tracing.last_upload_tid)})')
         quiet_period = self.tracing.now() - self.tracing.last_upload_tid
         if abs(quiet_period) >= 60*2:    # Force push every 2 minutes!
@@ -40,12 +41,14 @@ class RoomAnalysis:
                 f'Unable to receive all packet for {quiet_period} seconds. ') + \
                         color.bg_red('Force pushing to the queue!'))
             _bypass = True
-            # self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
+            logging.warning('Taking too long waiting for all ESP32. Dropping them...' + color.bg_cyan(
+                f"(total: {self.numEsp}->{len(self.received_esp32_list)})"))
+            self.numEsp = len(self.received_esp32_list)
 
-            logging.warning('Taking too long waiting for all ESP32. Dropping them...'+\
-                color.bg_cyan(f"Received ESP32: {unique(self.received_esp32_list)}. (total: {self.numEsp}->{len(unique(self.received_esp32_list))})"))
-            self.numEsp = len(unique(self.received_esp32_list))
-            self.received_esp32_list = []
+        if self.numEsp != len(self.received_esp32_list):
+            logging.info(color.tt_lightpurple(
+                f"Dynamically adjust awaiting ESP32...(total: {self.numEsp}->{len(self.received_esp32_list)})"))
+            self.numEsp = len(self.received_esp32_list)
 
         if espTid < self.currTid:
             logging.warning(f"Old packet, won't be analyzed [{espTid=}, relative: {color.tt_red(self.currTid-espTid)}]")
@@ -77,6 +80,7 @@ class RoomAnalysis:
                 self.currentAnalysisData = TimeFrameAnalysis(self.currTid, self.numEsp, self.roomId)
             if self.currentAnalysisData.putRows(espId, header, rows, bypass=_bypass):
                 self.putDataQueue()
+                logging.debug(f'Current Data:\n{self.currentAnalysisData.getDataFrame()}')
                 self.tracing.last_upload_tid = self.currTid     # tracing last upload (to queue)
 
     def putDataQueue(self):

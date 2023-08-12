@@ -44,12 +44,12 @@ class Listener:
     try:
       # self.dataHandler.put(str(msg.topic), str(msg.payload.decode("UTF-8")))
       logging.info(f'[Monitor] {msg.topic=}')
-      self.monitor.online_list.append(msg.topic.split('/')[-1])
+      self.monitor.received_list.append(msg.topic.split('/')[-1])
       self.n_devices -= 1
       if self.n_devices == 0:
-        self.monitor.check_alive(unique(self.monitor.online_list))
-        self.monitor.online_list = []     # recovery
-        self.n_devices = self._n_devices  # recovery
+        self.monitor.check_alive(unique(self.monitor.received_list))
+        self.monitor.received_list = []     # recovery
+        self.n_devices = self._n_devices    # recovery
         
     except Exception as e:
       logging.fatal(f'Skipping! Unable to handle: [{msg.topic = }] {e}')
@@ -80,7 +80,7 @@ class ESP32:
     __apiUrl = yaml_config['WISE_PaaS']['DataHub']['apiUrl']
     __nodeId = yaml_config['WISE_PaaS']['DataHub']['ESP32_monitor']['nodeId']
     __credentialKey = yaml_config['WISE_PaaS']['DataHub']['ESP32_monitor']['credentialKey']
-    self.online_list = []
+    self.received_list = []
     self.options_config = EdgeAgentOptions(
       nodeId = __nodeId,
       heartbeat = 60,                                         # 預設是 60 seconds
@@ -160,7 +160,9 @@ class ESP32:
     # logging.info(f'Disconnected from WISE-IoT Agnet.')
 
   def check_alive(self, espId: typing.Union[str, list]):
-    '''Quick method to check the availability of all ESP32'''
+    '''Quick method to check the availability of all ESP32.
+    Also uploading results to the DataHub.
+    '''
     if isinstance(espId, str):
       _id = espId.split('_')[-1][0]  # removing the appending 'char'
       for check_id in ['1','2','3','4']:

@@ -38,14 +38,15 @@ class MQTTListener():
 
     def on_message(self, mosq, obj, msg):
         try:
+            self.monitor.received_list.append(msg.topic.split('/')[-1])
+            online_list = unique(self.monitor.received_list)
+            logging.info(f'{color.bg_green("[Monitor]")} ({online_list}) {msg.topic=}') # 這裡抓得到當下活著的機器
+            self.dataHandler.received_esp32_list = online_list  # 每次訂閱到資料都會同步給dataHandler
+            if time() - self.monitor_timer > 20:        # monitor every 20 seconds
+                self.monitor.check_alive(online_list)
+                self.monitor.received_list = []         # recovery
+                self.monitor_timer = time()             # recovery
             self.dataHandler.put(str(msg.topic), str(msg.payload.decode("UTF-8")))
-
-            self.monitor.online_list.append(msg.topic.split('/')[-1])
-            logging.info(f'{color.bg_green("[Monitor]")} ({unique(self.monitor.online_list)}) {msg.topic=}')
-            if time() - self.monitor_timer > 20:    # monitor every 20 seconds
-                self.monitor.check_alive(unique(self.monitor.online_list))
-                self.monitor.online_list = []     # recovery
-                self.monitor_timer = time()       # recovery
 
         except Exception as e:
             logging.fatal(f'Skipping! Unable to handle: [{msg.topic = }] {e}')
